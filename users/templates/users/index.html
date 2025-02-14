@@ -1,5 +1,6 @@
+<!-- templates/users/index.html -->
 
-<!--templates/index.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,6 +8,16 @@
 </head>
 <body>
     <h1>Welcome to the Home Page</h1>
+    <ul id="MenuItems">
+
+        <li><a href="{% url 'index'%}">Home</a></li>
+        <li><a href="{%  url 'shop' %}">Shop</a></li>
+        <li><a href="">About</a></li>
+       
+        
+      </ul>
+      <ul>
+      </ul>
      
         <div class="menu-right flex items-center space-x-4">
         <p>Hello,
@@ -18,6 +29,15 @@
               
          </a>   
         </p>
+        
+        {%for product in products%}
+            <div class="product">
+                <h2>{{product.name}}</h2>
+                <p>{{product.price}}</p>
+                <p>{{product.description}}</p>
+                
+            </div>
+        {%endfor%}
         </div>
 </body>
 </html>
