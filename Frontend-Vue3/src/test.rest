@@ -1,0 +1,3 @@
+GET http://127.0.0.1:8000/getinfo
+Content-Type: application/json
+Authorization: TOKEN d7e43029ba02bc770ba40e59b10805ae295cbdd3
