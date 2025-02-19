@@ -11,7 +11,7 @@
     <ul id="MenuItems">
 
         <li><a href="{% url 'index'%}">Home</a></li>
-        <li><a href="{%  url 'shop' %}">Shop</a></li>
+        <li><a href="{%  url 'product' %}">Products</a></li>
         <li><a href="">About</a></li>
        
         
@@ -30,14 +30,11 @@
          </a>   
         </p>
         
-        {%for product in products%}
-            <div class="product">
-                <h2>{{product.name}}</h2>
-                <p>{{product.price}}</p>
-                <p>{{product.description}}</p>
-                
-            </div>
-        {%endfor%}
+        
+
+        {% include 'products/product_list.html' %}
+
+        
         </div>
 </body>
 </html>
