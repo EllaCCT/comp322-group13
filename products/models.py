@@ -9,7 +9,7 @@ class Category(models.Model):
         return self.name
     
 class Product(models.Model):
-    #pid=models.AutoField(primary_key=True)
+    #id=models.AutoField(primary_key=True,unique=True)
     category = models.ForeignKey(Category, related_name='products',on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
