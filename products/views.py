@@ -9,9 +9,12 @@ from django.views.generic import DetailView
     #context_object_name = 'product'
 
 def product_list(request):
-    product = Product.objects.all()
+    product = Product.objects.filter(is_show=True).prefetch_related('images')
+    #product = Product.objects.all()
     return render(request, 'products/product_list.html', {'product': product})
 
+
+
 def product_detail(request,slug):
-    product= get_object_or_404(Product, slug=slug)
+    product= get_object_or_404(Product.objects.prefetch_related('images'), slug=slug)
     return render(request, 'products/product_detail.html',{'product':product})

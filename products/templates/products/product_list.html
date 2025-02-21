@@ -4,6 +4,19 @@
 <div >
     
     <h2>{{product.name}}</h2>
+
+    {% with image=product.images.first %}
+    {% if image and image.thumbnail %}
+      <img src="{{ image.thumbnail.url }}" 
+           alt="{{ product.name }}"
+           class="product-thumbnail">
+    {% else %}
+      <img src="/static/images/default-thumbnail.jpg" 
+           alt="No Image"
+           class="product-thumbnail">
+    {% endif %}
+  {% endwith %}
+
     <p>{{product.price}}</p>
     <p>{{product.description}}</p>
     <a href="{% url 'product_detail' product.slug%}">View</a>

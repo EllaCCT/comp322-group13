@@ -7,7 +7,27 @@
     <div>
        <ul>
         <h1>{{ product.name }}</h1>
-        <!--img src="{{ product.image.url }}" alt="{{ product.name }}"-->
+
+        <div class="main-image">
+            {% with first_image=product.images.first %}
+              {% if first_image %}
+                <img src="{{ first_image.image.url }}" 
+                     alt="{{ product.name }}Main picture">
+              {% endif %}
+            {% endwith %}
+          </div>
+          
+          <div class="image-gallery">
+            {% for image in product.images.all %}
+              <div class="gallery-item">
+                <img src="{{ image.image.url }}" 
+                     alt="{{ product.name }} picture{{ forloop.counter }}"
+                     >
+              </div>
+            {% empty %}
+              <p>No picture</p>
+            {% endfor %}
+          </div>
         
         <p>Price: {{product.price}}</p>
 
