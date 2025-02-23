@@ -4,7 +4,7 @@
 <div >
     
     <h2>{{product.name}}</h2>
-
+    <!--獲取縮圖-->
     {% with image=product.images.first %}
     {% if image and image.thumbnail %}
       <img src="{{ image.thumbnail.url }}" 
@@ -16,6 +16,16 @@
            class="product-thumbnail">
     {% endif %}
   {% endwith %}
+    <!------------------------------>
+
+      <!-- 显示商品状态 -->
+    {% if product.is_sale %}
+        <span class="sale-badge">特价商品</span>
+    {% endif %}
+
+    {% if not product.is_show %}
+        <span class="hidden-badge">已隐藏</span>
+    {% endif %}
 
     <p>{{product.price}}</p>
     <p>{{product.description}}</p>

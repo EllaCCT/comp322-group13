@@ -12,7 +12,7 @@ def product_list(request):
     product = Product.objects.filter(is_show=True).prefetch_related('images')
     #product = Product.objects.all()
     return render(request, 'products/product_list.html', {'product': product})
-
+    
 
 
 def product_detail(request,slug):

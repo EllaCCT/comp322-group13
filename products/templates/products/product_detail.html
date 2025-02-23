@@ -7,15 +7,15 @@
     <div>
        <ul>
         <h1>{{ product.name }}</h1>
-
-        <div class="main-image">
+        <!--展示多張產品圖片-->
+        <!--div class="main-image">
             {% with first_image=product.images.first %}
               {% if first_image %}
                 <img src="{{ first_image.image.url }}" 
                      alt="{{ product.name }}Main picture">
               {% endif %}
             {% endwith %}
-          </div>
+          </div-->
           
           <div class="image-gallery">
             {% for image in product.images.all %}
@@ -28,7 +28,7 @@
               <p>No picture</p>
             {% endfor %}
           </div>
-        
+        <!----------------------------------------------->
         <p>Price: {{product.price}}</p>
 
         <p>{{ product.category.name }}</p>

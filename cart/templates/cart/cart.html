@@ -1,0 +1,30 @@
+<h1>Shopping Cart</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Product :</th>
+                <th>Quantity :</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart.items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.product.price }}</td>
+                <td>{{ item.total_price }}</td>
+                <td>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Total: {{ cart.total_price }}</h2>
+    <a href="#">Proceed to Checkout</a>

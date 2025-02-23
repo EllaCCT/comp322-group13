@@ -15,7 +15,11 @@ class ProductImageInline(admin.TabularInline):
     image_preview.short_description = 'Preview'
 
 class ProductAdmin(admin.ModelAdmin):
+    #list_display = ('id', 'name', 'category', 'price', 'is_show', 'is_sale')
+    search_fields = ['id', 'name', 'category__name']
     inlines = [ProductImageInline,]
+
+    readonly_fields = ['id']
     
 admin.site.register(Category)
 admin.site.register(Product,ProductAdmin)
