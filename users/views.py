@@ -1,14 +1,25 @@
 from django.db.models import Q
 from django.shortcuts import render
 from products.models import Product,Category
-#from django.views.generic import TemplateView
 
-#class index(TemplateView):
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+#from .forms import RegisterForm
+from django.views import generic
+
+#class IndexView(TemplateView):
     #template_name = 'users/index.html'
 
 def index(request): 
     products=Product.objects.all()[0:8]
     return render(request, 'users/index.html', {'products':products})
+
+#class SignUpView (generic.CreateView):
+    #form=RegisterForm()
+    #form_class = UserCreationForm
+    #success_url = reverse_lazy('login')
+    #template_name = 'users/signup.html'
 
 def product(request):
     categories=Category.objects.all()

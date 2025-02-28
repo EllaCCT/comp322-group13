@@ -9,7 +9,8 @@
     {% if image and image.thumbnail %}
       <img src="{{ image.thumbnail.url }}" 
            alt="{{ product.name }}"
-           class="product-thumbnail">
+           class="product-thumbnail"
+           width="400">
     {% else %}
       <img src="/static/images/default-thumbnail.jpg" 
            alt="No Image"

@@ -1,9 +1,11 @@
+<li><a href="{% url 'index'%}">Home</a></li>
 <h1>Shopping Cart</h1>
     <table>
         <thead>
             <tr>
-                <th>Product :</th>
-                <th>Quantity :</th>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Quantity </th>
                 <th>Price</th>
                 <th>Total</th>
                 <th>Actions</th>
@@ -12,12 +14,21 @@
         <tbody>
             {% for item in cart.items %}
             <tr>
+                <td>
+                    {% if item.thumbnail %}
+                        <img src="{{ item.thumbnail }}"
+                         alt="{{ item.product.name }}" width="150">
+                    {% else %}
+                        <span>No Thumbnail</span>
+                    {% endif %}
+                </td>
+                <td>{{ item.product.id }}</td>
                 <td>{{ item.product.name }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>{{ item.product.price }}</td>
                 <td>{{ item.total_price }}</td>
                 <td>
-                    <form action="" method="post">
+                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post">
                         {% csrf_token %}
                         <button type="submit">Remove</button>
                     </form>
@@ -27,4 +38,4 @@
         </tbody>
     </table>
     <h2>Total: {{ cart.total_price }}</h2>
-    <a href="#">Proceed to Checkout</a>
+    <a href="{% url 'checkout' %}">Proceed to Checkout</a>

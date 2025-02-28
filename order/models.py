@@ -16,9 +16,9 @@ class Order(models.Model):
         (REFUNDED, 'Refunded'),
     )
     #user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    order_id = models.CharField(max_length=50)
+    #order_id = models.AutoField(max_length=50)
     product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+    quantity = models.PositiveIntegerField()
     date_added = models.DateTimeField(auto_now_add=True)
 
     #訂單狀態
@@ -40,8 +40,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order,related_name='items',on_delete=models.CASCADE)
     product = models.ForeignKey('products.Product', related_name='items',on_delete=models.CASCADE)
-    price=models.IntegerField()
-    quantity=models.IntegerField(default=1)
+    price=models.PositiveIntegerField()
+    quantity=models.PositiveIntegerField(default=1)
 
     def get_total_price(self):
         return self.price * self.quantity

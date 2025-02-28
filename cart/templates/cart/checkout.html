@@ -1,6 +1,7 @@
-
+<a href="{% url 'index'%}">Home</a>
+{%block content%}
     <h1>Checkout</h1>
-    <form method="post" action="{% url 'cart:process_checkout' %}">
+    <form method="post" action="{% url 'checkout' %}">
         {% csrf_token %}
         <div>
             <label for="full_name">Full Name:</label>
@@ -12,3 +13,5 @@
             
         <button type="submit">Place Order</button>
     </form>
+
+{%endblock%}

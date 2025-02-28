@@ -1,4 +1,4 @@
-
+<a href="{% url 'index'%}">Home</a>
     <title>Product Detail</title>
 
     {%block content%}
@@ -22,7 +22,7 @@
               <div class="gallery-item">
                 <img src="{{ image.image.url }}" 
                      alt="{{ product.name }} picture{{ forloop.counter }}"
-                     >
+                     width="400">
               </div>
             {% empty %}
               <p>No picture</p>
@@ -37,8 +37,12 @@
             <p>{{product.description}}</p>
          {%endif%}
 
-        <button>Add to Cart</button>
-        </ul>
+        <form action="{% url 'add_to_cart' product.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit">Add to Cart</button>
+        </form>
+
+        
        
     </div> 
     
