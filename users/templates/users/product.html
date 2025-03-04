@@ -1,29 +1,145 @@
-<li><a href="{% url 'index'%}">Home</a></li>
-        <li><a href="{%  url 'product' %}">Products</a></li>
-        <li><a href="">About</a></li>
+<!-- templates/users/index.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ISI STORE | Ecommerce Website design</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
 
-<div>
-    <h1>Search</h1>
-    <form action="." method="GET">
-        <input type="text" name="query" placeholder="Search...">
-        <button type="submit">Search</button>
-    </form>
+<!-- 完整的Header部分 -->
+<div class="header">
+  <div class="container">
+    <!-- 导航栏完整结构 -->
+    <div class="navbar">
+      <div class="logo">
+        <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
+      </div>
 
-    <h2>Categories</h2>
-    <ul>
-        <li><a href="{% url 'product' %}">All Categories</a></li>
-        {% for category in categories %}
-        <li>    <!--判斷是否為該分類內的玩具,如果是就顯示-->
-            <a href="{% url 'product' %}?category={{ category.slug }}"
-            {% if not active_category %}text-purple-500{% else %} {% endif %}
-            >{{category.name}}</a></li>
-        
-        {% endfor%}
+      <nav>
+        <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
+        <ul id="MenuItems">
+          <li><a href="{% url 'index' %}">Home</a></li>
+          <li><a href="{% url 'product' %}">Products</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Login</a></li>
+          <!-- 购物车icon完整结构 -->
+          <li>
+            <a href="{% url 'cart' %}" class="cart-link">
+              <img src="{% static 'img/car.png' %}" 
+                   width="15" 
+                   height="15" 
+                   alt="Cart"
+                   style="vertical-align: middle;">
+              <span class="cart-quantity">{{ cart_quantity }}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-        
+    <div class="small-container">
+      <div class="row">
+        <h2 style="color: #223a77;">
+          {% if active_category %}{{ active_category.name }}{% else %}All Products{% endif %}
+        </h2>
 
-        {% include 'products/product_list.html' %}
+        <!-- 搜索框 -->
+        <div class="search-box">
+          <form action="." method="GET">
+            <input type="text" 
+                   name="query" 
+                   placeholder="Search toys..." 
+                   value="{{ request.GET.query }}">
+            <button type="submit" style="display:none"></button>
+          </form>
+        </div>
 
-        
-</div>
+        <!-- 分类下拉菜单 -->
+        <select onchange="window.location.href=this.value;">
+          <option value="{% url 'product' %}">All Categories</option>
+          {% for category in categories %}
+          <option value="?category={{ category.slug }}"
+                  {% if category.slug == request.GET.category %}selected{% endif %}>
+              {{ category.name }}
+          </option>
+          {% endfor %}
+        </select>
 
+        <!-- 排序下拉菜单 -->
+        <select onchange="window.location.href=this.value;">
+          <option value="?sort=default{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+                  {% if not request.GET.sort %}selected{% endif %}>
+              Default Sorting
+          </option>
+          <option value="?sort=price{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+                  {% if request.GET.sort == 'price' %}selected{% endif %}>
+              Sort by Price
+          </option>
+          <option value="?sort=popularity{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+                  {% if request.GET.sort == 'popularity' %}selected{% endif %}>
+              Sort by Popularity
+          </option>
+          <option value="?sort=sale{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+                  {% if request.GET.sort == 'sale' %}selected{% endif %}>
+              Sort by Sale
+          </option>
+        </select>
+      </div>
+
+      <!-- 产品列表 -->
+      <div class="row">
+        {% for product in products %}
+        <div class="col-4">
+          {% with image=product.images.first %}
+            {% if image and image.thumbnail %}
+              <img src="{{ image.thumbnail.url }}" 
+                   alt="{{ product.name }}"
+                   class="product-thumbnail">
+            {% else %}
+              <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                   alt="No Image"
+                   class="product-thumbnail">
+            {% endif %}
+          {% endwith %}
+          <h4>{{ product.name }}</h4>
+          {% if product.on_sale %}
+          <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
+          {% else %}
+          <p class="price">${{ product.price }}</p>
+          {% endif %}
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <p>No products found.</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- 分页 -->
+      <div class="page-btn">
+        {% for page in products.paginator.page_range %}
+        <a href="?page={{ page }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+           class="{% if products.number == page %}active{% endif %}">
+          <span>{{ page }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      var MenuItems = document.getElementById("MenuItems");
+      MenuItems.style.maxHeight = "0px";
+    
+      function menutoggle() {
+        MenuItems.style.maxHeight = 
+          MenuItems.style.maxHeight == "0px" ? "200px" : "0px";
+      }
+    </script>
+</body>
+</html>

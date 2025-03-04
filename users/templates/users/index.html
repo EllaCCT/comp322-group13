@@ -1,55 +1,222 @@
 <!-- templates/users/index.html -->
-
-
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-  {% load static %}
-  <title>Home</title>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <title>ISI STORE | Ecommerce Website design</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <h1>Welcome to the Home Page</h1>
-    <ul id="MenuItems">
 
-        <li><a href="{% url 'index'%}">Home</a></li>
-        <li><a href="{%  url 'product' %}">Products</a></li>
-        <li><a href="">About</a></li>
-        {% if user.is_authenticated %}
-        <form method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button type="submit">logout</button>
-      </form>
+<!-- 完整的Header部分 -->
+<div class="header">
+  <div class="container">
+    <!-- 导航栏完整结构 -->
+    <div class="navbar">
+      <div class="logo">
+        <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
+      </div>
+
+      <nav>
+        <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
+        <ul id="MenuItems">
+          <li><a href="{% url 'index' %}">Home</a></li>
+          <li><a href="{% url 'product' %}">Products</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Login</a></li>
+          <!-- 购物车icon完整结构 -->
+          <li>
+            <a href="{% url 'cart' %}" class="cart-link">
+              <img src="{% static 'img/car.png' %}" 
+                   width="15" 
+                   height="15" 
+                   alt="Cart"
+                   style="vertical-align: middle;">
+              <span class="cart-quantity">{{ cart_quantity }}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- 首页标题和图片区域 -->
+    <div class="row">
+      <div class="col-2">
+        <h1 style="color: #2b2a69;">Kidding</h1>
+        <h1 style="color: #2b2a69;">Around</h1>
+        <h1 style="color: #2b2a69;">Toys</h1>
+        <p style="color: #2b2a69;">The Best Toy Store In Macau</p>
+        <a href="#" class="btn" style="color: #ffffff;">SHOP OUR STORE</a>
+      </div>
+      <div class="col-2">
+        <img src="{% static 'img/homepage.webp' %}" alt="Homepage">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 分类展示区域 -->
+<div class="cate">
+  <div class="small-container">
+    <div class="row">
+      <div class="col-3">
+        <img src="{% static 'img/toy1.jpg' %}" alt="Toy 1">
+      </div>
+      <div class="col-3">
+        <img src="{% static 'img/toy2.jpg' %}" alt="Toy 2">
+      </div>
+      <div class="col-3">
+        <img src="{% static 'img/toy3.jpg' %}" alt="Toy 3">
+      </div>
+    </div>
+
+
+<!-- templates/users/index.html -->
+{% load static %}
+<div class="small-container">
+  <h2 class="s-tittle">Featured Products</h2>
+  <div class="row">
+    {# 第一个特色商品 #}
+    <div class="col-4">
+      {% with product=products.0 %}
+        {% if product %}
+        <a href="{% url 'product_detail' product.slug %}">
+            {% with product_image=product.images.first %}
+              {% if product_image and product_image.thumbnail and product_image.thumbnail.url %}
+                <img src="{{ product_image.thumbnail.url }}" alt="{{ product.name }}">
+              {% else %}
+                <img src="{% static 'img/toy5.jpg' %}" alt="{{ product.name }}">
+              {% endif %}
+            {% endwith %}
+          </a>
+          <h4>{{ product.name }}</h4>
+          <p class="price">${{ product.price }}</p>
+                    {# <a href="{% url 'product_detail' product.slug%}">View</a> #}
         {% else %}
-        <li><a href="{% url 'signup' %}">Sign Up</a></li>
-        <li><a href="{% url 'login' %}">Login</a></li>
+          {# 数据库无数据时的默认显示 #}
+          <img src="{% static 'img/toy5.jpg' %}" alt="Default Toy">
+          <h4>Default Toy</h4>
+          <p class="price">$11.00</p>
         {% endif %}
-        
-      </ul>
-      <ul>
-      </ul>
-     
-        <div class="menu-right flex items-center space-x-4">
-        {% if user.is_authenticated %}
-        <p>Hello,{{ user.get_username }}</p>
+      {% endwith %}
+    </div>
+
+    {# 第二个特色商品 #}
+    <div class="col-4">
+      {% with product=products.1 %}
+        {% if product %}
+        <a href="{% url 'product_detail' product.slug %}">
+            {% with product_image=product.images.first %}
+              {% if product_image and product_image.thumbnail and product_image.thumbnail.url %}
+                <img src="{{ product_image.thumbnail.url }}" alt="{{ product.name }}">
+              {% else %}
+                <img src="{% static 'img/toy5.jpg' %}" alt="{{ product.name }}">
+              {% endif %}
+            {% endwith %}
+          </a>
+          <h4>{{ product.name }}</h4>
+          <p class="price">${{ product.price }}</p>
+          {# <a href="{% url 'product_detail' product.slug%}">View</a> #}
+        {% else %}
+          {# 数据库无数据时的默认显示 #}
+          <img src="{% static 'img/toy5.jpg' %}" alt="Default Toy">
+          <h4>Default Toy</h4>
+          <p class="price">$11.00</p>
         {% endif %}
-        
-        
-        <a href="{% url 'cart' %}" id="menu-cart-button"class="relative">
-          <!--這個是購物車ICON,不用圖片,用SVG-->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-            </svg>
-          
-          <!---->
-          <span>{{cart_quantity}}</span>  
-       </a>  
-        {% include 'products/product_list.html' %}
+      {% endwith %}
+    </div>
 
-        
-        </div>
+    {# 第三个特色商品 #}
+    <div class="col-4">
+      {% with product=products.2 %}
+        {% if product %}
+        <a href="{% url 'product_detail' product.slug %}">
+            {% with product_image=product.images.first %}
+              {% if product_image and product_image.thumbnail and product_image.thumbnail.url %}
+                <img src="{{ product_image.thumbnail.url }}" alt="{{ product.name }}">
+              {% else %}
+                <img src="{% static 'img/toy5.jpg' %}" alt="{{ product.name }}">
+              {% endif %}
+            {% endwith %}
+          </a>
+          <h4>{{ product.name }}</h4>
+          <p class="price">${{ product.price }}</p>
+                    {# <a href="{% url 'product_detail' product.slug%}">View</a> #}
+        {% else %}
+          {# 数据库无数据时的默认显示 #}
+          <img src="{% static 'img/toy5.jpg' %}" alt="Default Toy">
+          <h4>Default Toy</h4>
+          <p class="price">$11.00</p>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    {# 第四个特色商品 #}
+    <div class="col-4">
+      {% with product=products.3 %}
+        {% if product %}
+        <a href="{% url 'product_detail' product.slug %}">
+            {% with product_image=product.images.first %}
+              {% if product_image and product_image.thumbnail and product_image.thumbnail.url %}
+                <img src="{{ product_image.thumbnail.url }}" alt="{{ product.name }}">
+              {% else %}
+                <img src="{% static 'img/toy5.jpg' %}" alt="{{ product.name }}">
+              {% endif %}
+            {% endwith %}
+          </a>
+          <h4>{{ product.name }}</h4>
+          <p class="price">${{ product.price }}</p>
+                    {# <a href="{% url 'product_detail' product.slug%}">View</a> #}
+        {% else %}
+          {# 数据库无数据时的默认显示 #}
+          <img src="{% static 'img/toy5.jpg' %}" alt="Default Toy">
+          <h4>Default Toy</h4>
+          <p class="price">$11.00</p>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+</div>
+</div>
+  
 
 
-      
+
+
+<!-- 完整的页脚 -->
+<div class="footer">
+  <div class="container">
+    <div class="row">
+
+
+      <div class="footer-col-2">
+        <img src="{% static 'img/logo-receipt_400x.avif' %}" alt="Footer Logo">
+        <p>For almost thirty years, we have proudly built our family-owned neighborhood toy store around outstanding quality, value, customer service, and heart.</p>
+      </div>
+
+    </div>
+    <hr>
+    <p>This website was created by MPU ISI Group 13</p>
+  </div>
+</div>
+
+<!-- JavaScript 保持完整 -->
+<script>
+  var MenuItems = document.getElementById("MenuItems");
+  MenuItems.style.maxHeight = "0px";
+
+  function menutoggle() {
+    if (MenuItems.style.maxHeight == "0px") {
+      MenuItems.style.maxHeight = "200px";
+    } else {
+      MenuItems.style.maxHeight = "0px";
+    }
+  }
+</script>
+
 </body>
 </html>
