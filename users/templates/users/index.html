@@ -4,7 +4,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
+  {% load static %}
+  <title>Home</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Welcome to the Home Page</h1>
@@ -13,14 +15,24 @@
         <li><a href="{% url 'index'%}">Home</a></li>
         <li><a href="{%  url 'product' %}">Products</a></li>
         <li><a href="">About</a></li>
-       
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">logout</button>
+      </form>
+        {% else %}
+        <li><a href="{% url 'signup' %}">Sign Up</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
         
       </ul>
       <ul>
       </ul>
      
         <div class="menu-right flex items-center space-x-4">
-        <p>Hello,</p>
+        {% if user.is_authenticated %}
+        <p>Hello,{{ user.get_username }}</p>
+        {% endif %}
         
         
         <a href="{% url 'cart' %}" id="menu-cart-button"class="relative">
