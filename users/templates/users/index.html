@@ -1,48 +1,8 @@
 <!-- templates/users/index.html -->
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ISI STORE | Ecommerce Website design</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
 
-<!-- 完整的Header部分 -->
-<div class="header">
-  <div class="container">
-    <!-- 导航栏完整结构 -->
-    <div class="navbar">
-      <div class="logo">
-        <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
-      </div>
-
-      <nav>
-        <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
-        <ul id="MenuItems">
-          <li><a href="{% url 'index' %}">Home</a></li>
-          <li><a href="{% url 'product' %}">Products</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">Login</a></li>
-          <!-- 购物车icon完整结构 -->
-          <li>
-            <a href="{% url 'cart' %}" class="cart-link">
-              <img src="{% static 'img/car.png' %}" 
-                   width="15" 
-                   height="15" 
-                   alt="Cart"
-                   style="vertical-align: middle;">
-              <span class="cart-quantity">{{ cart_quantity }}</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-
+{% block header_content %}
     <!-- 首页标题和图片区域 -->
     <div class="row">
       <div class="col-2">
@@ -58,7 +18,9 @@
     </div>
   </div>
 </div>
+{% endblock %}
 
+{% block content %}
 <!-- 分类展示区域 -->
 <div class="cate">
   <div class="small-container">
@@ -182,41 +144,4 @@
   </div>
 </div>
 </div>
-  
-
-
-
-
-<!-- 完整的页脚 -->
-<div class="footer">
-  <div class="container">
-    <div class="row">
-
-
-      <div class="footer-col-2">
-        <img src="{% static 'img/logo-receipt_400x.avif' %}" alt="Footer Logo">
-        <p>For almost thirty years, we have proudly built our family-owned neighborhood toy store around outstanding quality, value, customer service, and heart.</p>
-      </div>
-
-    </div>
-    <hr>
-    <p>This website was created by MPU ISI Group 13</p>
-  </div>
-</div>
-
-<!-- JavaScript 保持完整 -->
-<script>
-  var MenuItems = document.getElementById("MenuItems");
-  MenuItems.style.maxHeight = "0px";
-
-  function menutoggle() {
-    if (MenuItems.style.maxHeight == "0px") {
-      MenuItems.style.maxHeight = "200px";
-    } else {
-      MenuItems.style.maxHeight = "0px";
-    }
-  }
-</script>
-
-</body>
-</html>
+{% endblock %}

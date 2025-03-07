@@ -1,0 +1,29 @@
+
+{% block content %}
+<div class="order-list-container">
+    <h2 class="page-title">Your Orders</h2>
+    
+    {% if orders %}
+        <div>
+            {% for order in orders %}
+            <a href="{% url 'order_detail' order.id %}">
+                <div>
+                    <div>
+                        Order #{{ order.id }} 
+                    <div>
+                        <span>Ordered on {{ order.created_at|date:"F j, Y" }}</span>
+                        <span>Total: ${{ order.total_price }}</span>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div>
+            <p>You haven't placed any orders yet.</p>
+            <a href="{% url 'index' %}">Continue Shopping</a>
+        </div>
+    {% endif %}
+    <a href="{% url 'index' %}">Continue Shopping</a>
+</div>
+{% endblock %}

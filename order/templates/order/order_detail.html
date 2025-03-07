@@ -1,0 +1,60 @@
+
+{% block content %}
+<div>
+    <h2 >Order Details</h2>
+    
+    <div>
+        <div>
+            <div>
+                <span>Order Number:</span>
+                <span>{{ order.id }}</span>
+            </div>
+            <div>
+                <span >Order Date:</span>
+                <span>{{ order.date_added|date:"F j, Y H:i" }}</span>
+            </div>
+            <div>
+                <span>Status:</span>
+                <span  status-{{ order.status }}> {{ order.get_status_display }}</span>
+            </div>
+            {% if order.shipping_address %}
+                <div>
+                    <span>Shipping Address:</span>
+                    <span>{{ order.shipping_address }}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <h3>Items in this Order</h3>
+            {% for item in order.items.all %}
+                <div>
+                    <div>
+                        {% if item.product.images.first.thumbnail %}
+                            <img src="{{ item.product.images.first.thumbnail.url }}" 
+                                 alt="{{ item.product.name }}">
+                        {% else %}
+                            <div>No Image</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4>{{ item.product.name }}</h4>
+                        <div>
+                            <span>Price:${{ item.price|floatformat:2 }}</span>
+                            <span>Qunatity: {{ item.quantity }}</span>
+                            <span>Total Price:${{ item.total_price }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div>
+            <span>Total Amount:</span>
+            <span>${{ order.total_price }}</span>
+        </div>
+    </div>
+
+    <a href="{% url 'order_list' %}">← Back to Orders</a>
+</div>
+{% endblock %}

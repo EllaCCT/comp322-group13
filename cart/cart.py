@@ -27,13 +27,21 @@ class Cart(object):
         product_id = str(product.id)
 
         if product_id not in self.cart:
-            self.cart[product_id] = {'quantity':1,'id':product_id}
+            self.cart[product_id] = {
+            'quantity': max(quantity,1),
+            'id': product_id,
+            'price': str(product.price)  # 新增价格字段
+        }
+        else:
 
-        if update_quantity:
-            self.cart[product_id]['quantity'] += int(quantity)
+            if update_quantity:
+             self.cart[product_id]['quantity'] += quantity
+            else:
+                self.cart[product_id]['quantity'] = quantity 
 
-            if self.cart[product_id]['quantity'] == 0:
-                self.remove(product_id)
+            # 确保数量不低于1（除非移除）
+        if self.cart[product_id]['quantity'] < 1:
+            self.remove(product_id)
         self.save()
 
     def remove(self,product_id):
@@ -72,3 +80,12 @@ class Cart(object):
     def total_price(self):
         """計算購物車總金額"""
         return sum(item['total_price'] for item in self.items)
+    
+    def clear(self):
+        # 新增清空购物车方法
+        del self.session[settings.CART_SESSION_ID]
+        self.session.modified = True
+
+    def get_total_price(self):
+        # 更精确的计算方式
+        return sum(float(item['product'].price) * item['quantity'] for item in self.items)

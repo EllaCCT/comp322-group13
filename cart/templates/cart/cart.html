@@ -24,7 +24,21 @@
                 </td>
                 <td>{{ item.product.id }}</td>
                 <td>{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
+                <td>
+                    {{ item.quantity }}
+                    <!--商品加減-->
+                    <form action="{% url 'update_cart' item.product.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="decrease">
+                        <button type="submit">-</button>
+                      </form>
+                      {{ item.quantity }}
+                      <form action="{% url 'update_cart' item.product.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="increase">
+                        <button type="submit">+</button>
+                      </form>
+                </td>
                 <td>{{ item.product.price }}</td>
                 <td>{{ item.total_price }}</td>
                 <td>
