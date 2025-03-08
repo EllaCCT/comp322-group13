@@ -22,6 +22,6 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ['id']
     
 admin.site.register(Category)
-admin.site.register(Product,ProductAdmin)
+#admin.site.register(Product,ProductAdmin)
 #admin.site.register(ProductImage)
 

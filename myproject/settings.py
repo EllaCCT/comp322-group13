@@ -34,6 +34,7 @@ CART_SESSION_ID = 'cart'
 # Application definition
 
 INSTALLED_APPS = [
+    'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'users',
     'products',
     'order',
+    'management'
 ]
 
 MIDDLEWARE = [
@@ -136,6 +138,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR ,'media/')
 
 #AUTH_USER_MODEL = 'users.CustomUser'
+
+LOGIN_URL = "/login"
 
 LOGIN_REDIRECT_URL = '/'
 

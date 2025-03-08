@@ -22,11 +22,16 @@
 
       <nav>
         <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
-        <ul id="MenuItems">
+        <ul id="MenuItems"> 
+          {% if user.is_superuser %}
+          <li>Product management</li>
+          <li>Order management</li>
+          {% else %}
           <li><a href="{% url 'index' %}">Home</a></li>
           <li><a href="{% url 'product' %}">Products</a></li>
           <li><a href="{% url 'order_list' %}">Order</a></li>
           <li><a href="#">Contact</a></li>
+          {% endif %}
 
           {% if user.is_authenticated %}
           <li><a href="#" style="color: #2b2a69;">Hi, {{ user.username }}</a></li>
@@ -39,7 +44,7 @@
           {% else %}
           <li><a href="{% url 'login' %}">Login</a></li>
           {% endif %}
-
+          {% if not user.is_superuser %}
           <li>
             <a href="{% url 'cart' %}" class="cart-link">
               <img src="{% static 'img/car.png' %}" 
@@ -50,6 +55,7 @@
               <span class="cart-quantity">{{ cart_quantity }}</span>
             </a>
           </li>
+          {% endif %}
         </ul>
       </nav>
     </div>

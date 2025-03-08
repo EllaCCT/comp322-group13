@@ -1,0 +1,23 @@
+<!--{% extends 'base.html' %}-->
+
+{% block content %}
+{% csrf_token %}
+<h1>Product management</h1>
+<table>
+    <tr>
+        <th>ID</th><th>Name</th><th>Price</th><th>State</th>
+    </tr>
+    {% for product in object_list %}
+    <tr>
+        <td>{{product.id}}</td>
+        <td><a href="{% url "product_update" product.id %}">{{product.name}}</a></td>
+        <td>{{product.price}}</td>
+        {% if product.is_show %}
+        <td> on sale 
+        {% else %}
+        <td>hidden </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
