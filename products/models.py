@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django_ckeditor_5.fields import CKEditor5Field
 
 # Create your models here.
 class Category(models.Model):
@@ -19,7 +20,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products',on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
-    description = models.TextField()
+    description = CKEditor5Field('Description')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     #image = models.ForeignKey.ImageField(upload_to='product', blank=True, null=True)
     #thumbnail = models.ImageField(upload_to='thumbnail/', blank=True, null=True)

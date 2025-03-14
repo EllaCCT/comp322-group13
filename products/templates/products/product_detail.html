@@ -58,7 +58,7 @@
       {% if product.description %}
       <div class="product-description">
         <h3>Product Details</h3>
-        <p>{{ product.description }}</p>
+        <p>{{ product.description|safe }}</p>
       </div>
       {% endif %}
     </div>

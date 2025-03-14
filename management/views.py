@@ -1,4 +1,4 @@
-from django.views.generic import ListView , UpdateView
+from django.views.generic import ListView , UpdateView, CreateView
 from products.models import Product
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,3 +29,15 @@ class ProductUpdateView(LoginRequiredMixin,UpdateView):
 
     def handle_no_permission(self):
         return HttpResponseForbidden('')
+    
+class AddProductView(LoginRequiredMixin,CreateView):
+    model = Product
+    fields=[
+        'vendor',
+        'name',
+        'price',
+        'description',
+        'category'
+    ]
+    template_name = 'product_add.html'
+    success_url = reverse_lazy('vendor_product_list')
