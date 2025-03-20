@@ -24,8 +24,9 @@
         <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
         <ul id="MenuItems"> 
           {% if user.is_superuser %}
-          <li>Product management</li>
-          <li>Order management</li>
+          <li><a href="{% url 'index' %}">Home</a></li>
+          <li><a href="{% url 'vendor_product_list' %}">Product management</a></li>
+          <li><a href="{% url 'vendor_order_list' %}">Order management</a></li>
           {% else %}
           <li><a href="{% url 'index' %}">Home</a></li>
           <li><a href="{% url 'product' %}">Products</a></li>

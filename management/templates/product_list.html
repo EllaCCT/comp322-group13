@@ -1,22 +1,56 @@
 <!--{% extends 'base.html' %}-->
+{% load static %}
+
+{% block title %}Vendor Product List{% endblock %}
 
 {% block content %}
 {% csrf_token %}
 <h1>Product management</h1>
+
+    <div class="search-box">
+        <form action="." method="GET">
+            <input type="text" 
+                name="query" 
+                placeholder="Search by toys ID or Name" 
+                value="{{ request.GET.get_query}}">
+            <button type="submit" style="display:none">Submit</button>
+        </form>
+    </div>
+
+    {% if request.GET.query %}
+    <a href="{% url 'vendor_product_list' %}" class="back-button">Back to All Products</a>
+    {% endif %}
+
 <table>
+    <a href="{% url "product_add" %}">Add Product</a>
     <tr>
-        <th>ID</th><th>Name</th><th>Price</th><th>State</th>
+        <th>Thumbnail</th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>State</th>
+        <th>Actions</th>
     </tr>
     {% for product in object_list %}
     <tr>
+        <td><img src="{{product.images.first.thumbnail.url}}"></td>
         <td>{{product.id}}</td>
         <td><a href="{% url "product_update" product.id %}">{{product.name}}</a></td>
         <td>{{product.price}}</td>
+
         {% if product.is_show %}
-        <td> on sale 
+        <td> on sale </td>
         {% else %}
         <td>hidden </td>
         {% endif %}
+
+        <td>
+            <form action="{% url 'product_delete' product.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Delete">
+            </form>
+        </td>
+        
     </tr>
     {% endfor %}
 </table>

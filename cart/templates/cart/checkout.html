@@ -1,21 +1,26 @@
-<a href="{% url 'index'%}">Home</a>
-{%block content%}
-    <h1>Checkout</h1>
-    <form method="post" action="{% url 'checkout' %}">
-        {% csrf_token %}
-        <div>
-            <label for="full_name">Full Name:</label>
-            <input type="text" id="full_name" name="full_name" required>
-        </div>
-        <div>
-            <label for="order.shipping_address">Shipping Address:</label>
-            <input type="text" id="shipping_address" name="shipping_address" required>
-        </div>
-        <div>
-            <label for="order.phone">Phone:</label>
-            <input type="text" id="phone" name="phone" required>
-            
-        <button type="submit">Place Order</button>
-    </form>
+{% extends 'base.html' %}
 
-{%endblock%}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+
+<form method="post" action="{% url 'checkout' %}">
+    {% csrf_token %}
+    <div>
+        <label for="full_name">Full Name:</label>
+           {{ request.user.username|default:'' }}
+    </div>
+    <div>
+        <label for="email">Email:</label>
+            {{ request.user.email|default:'' }}
+    <!-- checkout.html -->
+<div>
+    <label for="shipping_address">Address:</label> 
+            {{ initial_data.shipping_address|default:'' }}
+        
+</div>
+
+    <button type="submit">Place Order</button>
+</form>
+
+{% endblock %}

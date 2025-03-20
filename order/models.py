@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 class Order(models.Model):
     PENDING= 'pending'
@@ -36,6 +37,21 @@ class Order(models.Model):
         
     def __str__(self):
         return f"Order {self.id} - {self.user.username}"
+    
+    # 在 Order 模型的 save() 方法中
+    def save(self, *args, **kwargs):
+        if self.status == Order.SHIPPED and not self.shipment_date:
+            self.shipment_date = timezone.now()
+        elif self.status == Order.CANCELLED and not self.cancellation_date:
+            self.cancellation_date = timezone.now()
+        elif self.status == Order.REFUNDED and not self.refund_date:
+            self.refund_date = timezone.now()
+    # 其他狀態同理
+
+        if not self.pk:  # 連接shipping_address=member.address
+            if self.user and hasattr(self.user, 'member'):
+                self.shipping_address = self.user.member.address
+        super().save(*args, **kwargs)
     
     @property
     def total_price(self):

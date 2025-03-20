@@ -5,6 +5,7 @@ from products.models import Product
 
 from order.models import Order, OrderItem
 from products.models import Product
+from users.models import Member
 from .cart import Cart
 
 @login_required(login_url='/login/')
@@ -45,7 +46,8 @@ def add_to_cart(request, product_id):
 @login_required
 def checkout(request):
     cart = Cart(request)
-    
+    user = request.user
+
     # 关键修改：创建订单逻辑
     if request.method == 'POST':
         # 验证购物车非空
@@ -70,4 +72,8 @@ def checkout(request):
         cart.clear()
         return redirect('order_detail', order_id=order.id)
     
-    return render(request, 'cart/checkout.html', {'cart': cart})
+    initial_data = {} #關聯地址
+    if hasattr(user, 'member'):
+        initial_data['shipping_address'] = user.member.address
+    
+    return render(request, 'cart/checkout.html', {'initial_data': initial_data, 'cart': cart})

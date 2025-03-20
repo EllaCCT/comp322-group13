@@ -1,8 +1,43 @@
+<!--{% extends 'base.html' %}-->
+{% load static %}
+
 {% block content %}
+{% csrf_token %}
+
 <h1>Update</h1>
-<form method ="post">
+<form method ="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {{ form.media }} 
     {{ form.as_p }}
-    <input type=submit value="Save changes"></input>
+    
+    <div>
+        <label>Status:</label>
+        
+            {{ form.is_show }}
+            {{ form.is_sale }}
+        
+    </div>
+
+    <h3>Product Images</h3>
+    {{ image_formset.management_form }}
+    {% for form in image_formset %}
+    <div>
+        {% if form.instance.image %}
+        <img src="{{ form.instance.image.url }}" style="max-height: 100px;">
+        {% endif %}
+        
+        <table>
+        {{ form.image.label_tag }}
+        {{ form.image }}
+        
+        <!-- 添加缩略图上传字段 -->
+        {{ form.thumbnail.label_tag }}
+        {{ form.thumbnail }}
+        
+        </table>
+    </div>
+    {% endfor %}
+    
+    <input type="submit" value="Save Product">
 </form>
 {% endblock %}

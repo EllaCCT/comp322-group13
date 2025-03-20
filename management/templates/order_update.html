@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Order{% endblock %}
+
+{% load static %}
+
+{% csrf_token %}
+{% block content %}
+<div>
+    <h2>Order Details</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- 客戶基本信息（只讀） -->
+        <div>
+            <p>Name: {{ order.user.username }}</p>
+            <p>Email:{{order.user.email}}</p>
+            <p>Shipping Address: {{ order.shipping_address }}</p>
+        </div>
+
+
+         <!-- 狀態對應的日期顯示 -->
+        <div>
+            {% if order.shipment_date %}
+                <p>Shipment Date: {{ order.shipment_date|date:"F j, Y, g:i a" }}</p>
+            {% endif %}
+            {% if order.cancellation_date %}
+                <p>Cancellation Date: {{ order.cancellation_date|date:"F j, Y, g:i a" }}</p>
+            {% endif %}
+            {% if order.ticket_issue_date %}
+                <p>Ticket Issue Date: {{ order.ticket_issue_date|date:"F j, Y, g:i a" }}</p>
+            {% endif %}
+            {% if order.refund_date %}
+                <p>Refund Date: {{ order.refund_date|date:"F j, Y, g:i a" }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.as_p }}  <!-- 僅渲染 status 字段 -->
+        </div>
+
+        <!-- 訂單項目顯示（非表單） -->
+    <div>
+    <h3>Order Items</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{item.total_price }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+        <div>
+            <p>Total Price: ${{ order.total_price }}</p>
+    </div>
+
+        <button type="submit">Save Changes</button>
+        <span>
+        <div>
+        <a href="{% url 'vendor_order_list' %}">← Back to Orders</a>
+        </div>
+        </span>
+    </form>
+</div>
+{% endblock %}

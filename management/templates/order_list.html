@@ -1,0 +1,51 @@
+<!--{% extends 'base.html' %}-->
+{% load static %}
+
+{% block title %}Vendor Order List{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<h1>Order management</h1>
+
+    <div class="search-box">
+        <form action="." method="GET">
+            <input type="text" 
+                name="query" 
+                placeholder="Search by order ID or Name" 
+                value="{{ request.GET.query}}">
+            <button type="submit" style="display:none">Submit</button>
+        </form>
+    </div>
+
+    {% if request.GET.query %}
+    <a href="{% url 'vendor_order_list' %}" class="back-button">Back to All Orders</a>
+    {% endif %}
+
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User Name</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Date Added</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in object_list%}
+            <tr>
+                <td><a href="{% url 'order_update' order.id %}">Order #{{ order.id }}</a></td>
+                <td>{{ order.user.username }}</td>
+                <td>{{ order.total_price }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.date_added }}</td>
+                <td>{{ order.shipping_address }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

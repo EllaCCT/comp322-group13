@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from products.models import Product,Category
 from django.contrib.auth import authenticate, login as login_auth
 from .forms import RegisterForm
+from users.models import Member
 
 #class IndexView(TemplateView):
     #template_name = 'users/index.html'
@@ -15,14 +16,14 @@ def register(request):
     form = RegisterForm(request.POST or None)
     if form.is_valid():
         user = form.save()
+        address = form.cleaned_data.get('address', '')  # 假設表單有 address 字段
+        Member.objects.create(user=user, email=user.email, address=address)
         login(request, user)
         return redirect('index')
     
-    context = {
-        'form': form
-    }
+    #context = { 'form': form}
 
-    return render(request, 'users/signup.html', context)
+    return render(request, 'users/signup.html',  {'form': form})
 
 def login(request):
     if request.method == "POST":

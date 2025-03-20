@@ -11,7 +11,7 @@
                     <div>
                         Order #{{ order.id }} 
                     <div>
-                        <span>Ordered on {{ order.created_at|date:"F j, Y" }}</span>
+                        <span>Ordered on {{ order.date_added|date:"F j, Y" }}</span>
                         <span>Total: ${{ order.total_price }}</span>
                     </div>
                 </div>
