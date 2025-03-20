@@ -1,29 +1,510 @@
+<!-- templates/users/product.html -->
+{% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="order-list-container">
-    <h2 class="page-title">Your Orders</h2>
+<div class="order-container">
+    <h1 class="order-header">Order History</h1>
     
+    <!-- 状态筛选器 -->
+    <div class="status-filter" id="statusFilter">
+        <button class="filter-btn active" data-status="all">All</button>
+        <button class="filter-btn" data-status="pending">Pending</button>
+        <button class="filter-btn" data-status="ordered">Ordered</button>
+        <button class="filter-btn" data-status="shipped">Shipped</button>
+        <button class="filter-btn" data-status="cancelled">Cancelled</button>
+        <button class="filter-btn" data-status="refunded">Refunded</button>
+    </div>
+
     {% if orders %}
-        <div>
+        <div class="order-list">
             {% for order in orders %}
-            <a href="{% url 'order_detail' order.id %}">
-                <div>
-                    <div>
-                        Order #{{ order.id }} 
-                    <div>
-                        <span>Ordered on {{ order.date_added|date:"F j, Y" }}</span>
-                        <span>Total: ${{ order.total_price }}</span>
+            <a href="{% url 'order_detail' order.id %}" class="order-item" data-status="{{ order.status|lower }}">
+                <div class="order-header-line">
+                    <div class="order-id-group">
+                        <span class="order-id">ORDER #{{ order.id }}</span>
+                        <span class="order-date">{{ order.date_added|date:"M d, Y H:i" }}</span>
                     </div>
+                    <span class="order-status status-{{ order.status|lower }}">{{ order.get_status_display }}</span>
+                </div>
+
+                <div class="product-list">
+                    {% for item in order.items.all %}
+                    <div class="product-item">
+                        <div class="product-image">
+                            {% if item.product.images.first.thumbnail %}
+                                <img src="{{ item.product.images.first.thumbnail.url }}" 
+                                     alt="{{ item.product.name }}"
+                                     class="product-thumb">
+                            {% else %}
+                                <div class="image-placeholder">📦</div>
+                            {% endif %}
+                        </div>
+                        <div class="product-details">
+                            <div class="product-name-row">
+                                <span class="product-name">{{ item.product.name }}</span>
+                                <span class="product-qty">×{{ item.quantity }}</span>
+                            </div>
+                            <div class="product-price">${{ item.price|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="order-footer">
+                    <span class="total-label">Total Amount:</span>
+                    <span class="total-value">${{ order.total_price|floatformat:2 }}</span>
                 </div>
             </a>
-        {% endfor %}
+            {% endfor %}
         </div>
     {% else %}
-        <div>
-            <p>You haven't placed any orders yet.</p>
-            <a href="{% url 'index' %}">Continue Shopping</a>
+        <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3 class="empty-title">No Orders Found</h3>
+            <p class="empty-text">Start exploring our products collection</p>
         </div>
     {% endif %}
-    <a href="{% url 'index' %}">Continue Shopping</a>
+    
+    <div class="action-bar">
+        <a href="{% url 'index' %}" class="return-btn">
+            🛍️ Continue Shopping
+        </a>
+    </div>
 </div>
+
+<style>
+.order-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.order-header {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #223a77;
+    margin-bottom: 2rem;
+    border-bottom: 4px solid #223a77;
+    padding-bottom: 1rem;
+}
+
+.status-filter {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    border-color: #223a77;
+    background: #223a77;
+    color: white;
+}
+
+.order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.order-item {
+    display: block;
+    background: white;
+    border: 2px solid #e2e8f0;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.order-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-color: #223a77;
+}
+
+.order-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.order-id-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-id {
+    font-weight: 700;
+    color: #223a77;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+}
+
+.order-date {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.order-status {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    text-transform: uppercase;
+    border: 2px solid;
+    font-weight: 600;
+}
+
+.status-pending { color: #666; border-color: #666; }
+.status-ordered { color: rgb(89, 121, 203); ; border-color:rgb(89, 121, 203); }
+.status-shipped { color: #00b578; border-color: #00b578; }
+.status-cancelled { color: #ff3141; border-color: #ff3141; }
+.status-refunded { color: #8a8a8a; border-color: #8a8a8a; }
+
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 1rem 0;
+}
+
+.product-item {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.product-image {
+    flex-shrink: 0;
+}
+
+.product-thumb {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #e2e8f0;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.product-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-name-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.product-name {
+    font-weight: 500;
+    color: #223a77;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1.1rem;
+}
+
+.product-qty {
+    color: #718096;
+    font-size: 0.95rem;
+}
+
+.product-price {
+    color: #223a77;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.order-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+    text-align: right;
+}
+
+.total-value {
+    color: #223a77;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-left: 12px;
+}
+
+.action-bar {
+    margin: 3rem 0;
+    text-align: center;
+}
+
+.return-btn {
+    background: #223a77;
+    color: white !important;
+    padding: 1.2rem 3rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.return-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    background: #1a2f5d;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 0;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+    .order-container {
+        padding: 0 1rem;
+    }
+    
+    .product-item {
+        gap: 1rem;
+    }
+    
+    .product-thumb {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .order-id {
+        font-size: 1.1rem;
+    }
+    
+    .return-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.no-result-message {
+    text-align: center;
+    padding: 3rem 0;
+    margin: 2rem 0;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.no-result-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.no-result-text {
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+.filter-btn {
+    position: relative;
+    padding-right: 32px !important;
+}
+
+.count-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: rgb(33, 37, 142);
+    color: white;
+    font-size: 12px;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+/* 选中状态样式 */
+.filter-btn.active .count-badge {
+    background: white !important;
+    color: #223a77 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 0 0 2px #223a77;
+}
+
+/* 零值样式 */
+.count-badge[data-count="0"] {
+    background: #94a3b8 !important;
+    opacity: 0.5;
+}
+
+/* 以下原有样式完全保持不变 */
+.order-container {
+    max-width: 1200px;
+    /* ...其他原有样式... */
+}
+</style>
+
+<script>
+    const statusCounts = {
+        all: document.querySelectorAll('.order-item').length,
+        pending: 0,
+        ordered: 0,
+        shipped: 0,
+        cancelled: 0,
+        refunded: 0
+    };
+
+    // 统计各状态数量
+    document.querySelectorAll('.order-item').forEach(order => {
+        const status = order.dataset.status.toLowerCase();
+        if (statusCounts.hasOwnProperty(status)) {
+            statusCounts[status]++;
+        }
+    });
+
+    // 创建徽章
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        const status = button.dataset.status;
+        const count = status === 'all' ? statusCounts.all : statusCounts[status];
+        const badge = document.createElement('span');
+        badge.className = 'count-badge';
+        badge.textContent = count;
+        badge.dataset.count = count;
+        button.appendChild(badge);
+    });
+
+    // 筛选功能
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const orderItems = document.querySelectorAll('.order-item');
+    const orderList = document.querySelector('.order-list');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 更新按钮状态
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // 更新筛选结果
+            const status = this.dataset.status;
+            let visibleCount = 0;
+            
+            orderItems.forEach(order => {
+                const show = status === 'all' || 
+                            order.dataset.status === status;
+                order.style.display = show ? 'block' : 'none';
+                if(show) visibleCount++;
+            });
+
+            // 处理空状态
+            const existingMsg = orderList.querySelector('.no-result-message');
+            if(existingMsg) existingMsg.remove();
+
+            if(visibleCount === 0) {
+                const statusName = {
+                    all: 'All',
+                    pending: 'Pending',
+                    ordered: 'Ordered',
+                    shipped: 'Shipped',
+                    cancelled: 'Cancelled',
+                    refunded: 'Refunded'
+                }[status];
+
+                const message = document.createElement('div');
+                message.className = 'no-result-message';
+                message.innerHTML = `
+                    <div class="no-result-icon">📭</div>
+                    <h3>No ${statusName} Orders Found</h3>
+                    <p class="no-result-text">Try selecting a different status</p>
+                `;
+                orderList.appendChild(message);
+            }
+        });
+    });
+
+    // 初始化第一个按钮的徽章样式
+    
+
+// 以下原有筛选逻辑保持不变
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const orderItems = document.querySelectorAll('.order-item');
+    const orderList = document.querySelector('.order-list');
+
+    // 状态名称映射
+    const statusLabels = {
+        all: 'All',
+        pending: 'Pending',
+        ordered: 'Ordered',
+        shipped: 'Shipped',
+        cancelled: 'Cancelled',
+        refunded: 'Refunded'
+    };
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 重置状态
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            const status = this.dataset.status;
+
+            // 清除旧提示
+            const existingMessage = orderList.querySelector('.no-result-message');
+            if(existingMessage) existingMessage.remove();
+
+            // 筛选逻辑
+            let visibleCount = 0;
+            orderItems.forEach(order => {
+                const showItem = status === 'all' || order.dataset.status === status;
+                order.style.display = showItem ? 'block' : 'none';
+                if(showItem) visibleCount++;
+            });
+
+            // 显示空状态提示
+            if(visibleCount === 0) {
+                const statusName = statusLabels[status];
+                const message = document.createElement('div');
+                message.className = 'no-result-message';
+                message.innerHTML = `
+                    <div class="no-result-icon">📭</div>
+                    <h3>No ${statusName} Orders Found</h3>
+                    <p class="no-result-text">Try selecting a different status</p>
+                `;
+                orderList.appendChild(message);
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}

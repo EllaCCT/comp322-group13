@@ -4,69 +4,73 @@
 
 {% block content %}
     <div class="small-container">
-      <div class="row">
-        <h2 style="color: #223a77;">
+      <div class="top-controls">
+        <h2 style="color: #223a77; margin-bottom: 20px;">
           {% if active_category %}{{ active_category.name }}{% else %}All Products{% endif %}
         </h2>
 
-        <!-- 搜索框 -->
-        <div class="search-box">
-          <form action="." method="GET">
-            <input type="text" 
-                   name="query" 
-                   placeholder="Search toys..." 
-                   value="{{ request.GET.query }}">
-            <button type="submit" style="display:none"></button>
-          </form>
+        <div class="controls-wrapper">
+          <!-- 搜索和按钮容器 -->
+          <div class="header-row">
+            <div class="search-box">
+              <form action="." method="GET">
+                <input type="text" 
+                       name="query" 
+                       placeholder="Search toys..." 
+                       value="{{ request.GET.query }}">
+                <button type="submit" style="display:none"></button>
+              </form>
+            </div>
+            <button class="mobile-filter-btn" id="toggleFilters">☰</button>
+          </div>
+
+          <!-- 价格筛选 -->
+          <div class="price-filter">
+            <input type="number" 
+                   id="minPrice" 
+                   placeholder="Min price" 
+                   min="0"
+                   step="any">
+            <span>-</span>
+            <input type="number" 
+                   id="maxPrice" 
+                   placeholder="Max price" 
+                   min="0"
+                   step="any">
+            <button class="filter-btn" onclick="validateAndFilter()">Filter</button>
+          </div>
+
+          <!-- 分类下拉菜单 -->
+          <select class="custom-select" onchange="window.location.href=this.value;">
+            <option value="{% url 'product' %}">All Categories</option>
+            {% for category in categories %}
+            <option value="?category={{ category.slug }}"
+                    {% if category.slug == request.GET.category %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+            {% endfor %}
+          </select>
         </div>
-
-        <!-- 分类下拉菜单 -->
-        <select onchange="window.location.href=this.value;">
-          <option value="{% url 'product' %}">All Categories</option>
-          {% for category in categories %}
-          <option value="?category={{ category.slug }}"
-                  {% if category.slug == request.GET.category %}selected{% endif %}>
-              {{ category.name }}
-          </option>
-          {% endfor %}
-        </select>
-
-        <!-- 排序下拉菜单 -->
-        <select onchange="window.location.href=this.value;">
-          <option value="?sort=default{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                  {% if not request.GET.sort %}selected{% endif %}>
-              Default Sorting
-          </option>
-          <option value="?sort=price{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                  {% if request.GET.sort == 'price' %}selected{% endif %}>
-              Sort by Price
-          </option>
-          <option value="?sort=popularity{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                  {% if request.GET.sort == 'popularity' %}selected{% endif %}>
-              Sort by Popularity
-          </option>
-          <option value="?sort=sale{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                  {% if request.GET.sort == 'sale' %}selected{% endif %}>
-              Sort by Sale
-          </option>
-        </select>
       </div>
 
       <!-- 产品列表 -->
       <div class="row">
         {% for product in products %}
-        <div class="col-4">
-          {% with image=product.images.first %}
-            {% if image and image.thumbnail %}
-              <img src="{{ image.thumbnail.url }}" 
-                   alt="{{ product.name }}"
-                   class="product-thumbnail">
-            {% else %}
-              <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                   alt="No Image"
-                   class="product-thumbnail">
-            {% endif %}
-          {% endwith %}
+        <div class="col-4" 
+             data-price="{% if product.on_sale %}{{ product.sale_price }}{% else %}{{ product.price }}{% endif %}">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% with image=product.images.first %}
+              {% if image and image.thumbnail %}
+                <img src="{{ image.thumbnail.url }}" 
+                     alt="{{ product.name }}"
+                     class="product-thumbnail">
+              {% else %}
+                <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                     alt="No Image"
+                     class="product-thumbnail">
+              {% endif %}
+            {% endwith %}
+          </a>
           <h4>{{ product.name }}</h4>
           {% if product.on_sale %}
           <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
@@ -84,7 +88,7 @@
       <!-- 分页 -->
       <div class="page-btn">
         {% for page in products.paginator.page_range %}
-        <a href="?page={{ page }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+        <a href="?page={{ page }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
            class="{% if products.number == page %}active{% endif %}">
           <span>{{ page }}</span>
         </a>
@@ -92,4 +96,179 @@
       </div>
     </div>
 
+    <style>
+    .error-alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff4444;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .top-controls {
+      margin-bottom: 30px;
+    }
+
+    .controls-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      height: 38px;
+      box-sizing: border-box;
+    }
+
+    .mobile-filter-btn {
+      display: none;
+      background: #223a77;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      height: 38px;
+      min-width: 40px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .price-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .price-filter input {
+      width: 100px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      height: 38px;
+    }
+
+    .filter-btn {
+      background: #223a77;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      height: 38px;
+      cursor: pointer;
+    }
+
+    .custom-select {
+      padding: 0 15px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      height: 38px;
+      min-width: 160px;
+    }
+
+    @media (max-width: 768px) {
+      .controls-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+      }
+
+      .header-row {
+        max-width: none;
+        width: 100%;
+        order: -1;
+      }
+
+      .mobile-filter-btn {
+        display: block;
+      }
+
+      .price-filter,
+      .custom-select {
+        display: none !important;
+      }
+
+      .controls-wrapper.active .price-filter,
+      .controls-wrapper.active .custom-select {
+        display: flex !important;
+      }
+
+      .price-filter input {
+        width: 100%;
+      }
+
+      .custom-select {
+        width: 100%;
+      }
+    }
+    </style>
+
+    <script>
+    // 手机筛选切换
+    document.getElementById('toggleFilters').addEventListener('click', function(e) {
+      e.preventDefault();
+      const wrapper = document.querySelector('.controls-wrapper');
+      wrapper.classList.toggle('active');
+      this.textContent = wrapper.classList.contains('active') ? '✕' : '☰';
+    });
+
+    // 价格筛选功能
+    function validateAndFilter() {
+      const min = parseFloat(document.getElementById('minPrice').value) || 0;
+      const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+      
+      if (min > max) {
+        showError('Error: Minimum value cannot be greater than maximum value');
+        return;
+      }
+
+      filterByPrice(min, max);
+    }
+
+    function filterByPrice(min, max) {
+      document.querySelectorAll('.col-4').forEach(product => {
+        const price = parseFloat(product.dataset.price);
+        product.style.display = (price >= min && price <= max) ? 'block' : 'none';
+      });
+    }
+
+    // 显示错误提示
+    function showError(message) {
+      const existingAlert = document.querySelector('.error-alert');
+      if(existingAlert) existingAlert.remove();
+
+      const alertBox = document.createElement('div');
+      alertBox.className = 'error-alert';
+      alertBox.textContent = message;
+      document.body.appendChild(alertBox);
+      
+      setTimeout(() => {
+        alertBox.remove();
+      }, 3000);
+    }
+    </script>
 {% endblock %}

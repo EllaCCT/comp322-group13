@@ -5,23 +5,54 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="container">
-  <form action="{% url 'login' %}" method="post">
-      {% csrf_token %}
-      <div class="form-group">
-          <label class="text-primary text-dark font-weight-bold">Enter Username</label>
-          <input type="text" class="form-control" name="username" placeholder="Enter Username">
+
+
+<div class="Login-page">
+    <div class="container">
+      <div class="row">
+
+        
+
+        <div class="col-2">
+          <div class="form-container" style="    height: 300px";>
+            <div class="form-btn" >
+              <a>Login</a>
+            </div>
+
+            <form action="{% url 'login' %}" method="post" style="
+            right: 0px;
+            left: 0px;
+            top: 60px;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="text-primary text-dark font-weight-bold"></label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter Username">
+                </div>
+          
+                <br>
+                <div class="form-group">
+                    <label class="text-primary text-dark font-weight-bold"></label>
+                    <input type="password" class="form-control" name="password" placeholder="Enter Password">
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary btn-lg">Log in</button>
+                <br>
+                <a href="{% url 'signup' %}"  style="
+                font-size: 15px; ">Don't have an account? Register here</a>
+            </form>
+
+
+          </div>
+        </div>
+        <div class="col-2">
+            <img src="{% static 'img/homepage.webp' %}" alt="Homepage">   
+             </div>
       </div>
 
-      <br>
-      <div class="form-group">
-          <label class="text-primary text-dark font-weight-bold">Enter Password</label>
-          <input type="password" class="form-control" name="password" placeholder="Enter Password">
-      </div>
-      <br>
-      <button type="submit" class="btn btn-primary btn-lg">Log in</button>
-      <br>
-      <a href="{% url 'signup' %}">Don't have an account? Register here</a>
-  </form>
+    </div>
+  </div>
+
 </div>
+
+
 {% endblock %}
