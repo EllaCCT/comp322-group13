@@ -60,8 +60,11 @@
                  required
                  style="width: 80px; padding: 8px;">
         </div>
-
+        {% if product.stock == 0 %}
+        <button type="submit" class="btn" disabled>Add to Cart</button>
+        {% else %}
         <button type="submit" class="btn">Add to Cart</button>
+        {% endif %}
       </form>
 
       {% if product.description %}

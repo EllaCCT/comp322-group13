@@ -25,14 +25,15 @@ class Product(models.Model):
     #image = models.ForeignKey.ImageField(upload_to='product', blank=True, null=True)
     #thumbnail = models.ImageField(upload_to='thumbnail/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
     is_sale = models.BooleanField(verbose_name="hide product",default=False)
-    is_show = models.BooleanField(verbose_name="show product",default=True)
+    is_show = models.BooleanField(verbose_name="show/hide product",default=True)
+    stock = models.PositiveIntcegerField(null=False,blank=False)
 
+    def instock(self):
+        return self.stock
+    
     def __str__(self):
-        return self.name
-    
-    
+        return self.name    
     
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images',on_delete=models.CASCADE)

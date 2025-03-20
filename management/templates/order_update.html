@@ -17,21 +17,20 @@
             <p>Name: {{ order.user.username }}</p>
             <p>Email:{{order.user.email}}</p>
             <p>Shipping Address: {{ order.shipping_address }}</p>
+            <p>Ordered Date: {{ order.date_added}}
         </div>
 
 
          <!-- 狀態對應的日期顯示 -->
         <div>
-            {% if order.shipment_date %}
+            {% if order.status == 'Shipped' %}
                 <p>Shipment Date: {{ order.shipment_date|date:"F j, Y, g:i a" }}</p>
             {% endif %}
-            {% if order.cancellation_date %}
+            {% if order.status == 'Cancelled' %}
                 <p>Cancellation Date: {{ order.cancellation_date|date:"F j, Y, g:i a" }}</p>
             {% endif %}
-            {% if order.ticket_issue_date %}
-                <p>Ticket Issue Date: {{ order.ticket_issue_date|date:"F j, Y, g:i a" }}</p>
-            {% endif %}
-            {% if order.refund_date %}
+            {% if order.status == 'Refunded' %}
+                <p>Cancellation Date: {{ order.cancellation_date|date:"F j, Y, g:i a" }}</p>
                 <p>Refund Date: {{ order.refund_date|date:"F j, Y, g:i a" }}</p>
             {% endif %}
         </div>

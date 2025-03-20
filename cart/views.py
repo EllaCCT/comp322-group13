@@ -20,14 +20,14 @@ def update_cart(request, product_id):
     action = request.POST.get('action')
 
     if action == 'increase':
-        cart.add(product, quantity=1, update_quantity=True)
+        cart.add(product, 1, True)
     elif action == 'decrease':
         # 减少数量时，若当前数量为1则移除商品
         current_quantity = cart.cart.get(str(product_id), {}).get('quantity', 0)
         if current_quantity <= 1:
             cart.remove(product_id)
         else:
-            cart.add(product, quantity=-1, update_quantity=True)
+            cart.add(product, -1, True)
     
     return redirect('cart')
 

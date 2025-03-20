@@ -2,34 +2,26 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-class Order(models.Model):
-    PENDING= 'pending'
-    ORDERED = 'ordered'
-    SHIPPED = 'shipped'
-    CANCELLED = 'cancelled'
-    REFUNDED = 'refunded'
-
-    STATUS_CHOICES = (
-        (PENDING, 'Pending'),
-        (ORDERED, 'Ordered'),
-        (SHIPPED, 'Shipped'),
-        (CANCELLED, 'Cancelled'),
-        (REFUNDED, 'Refunded'),
-    )
+class Order(models.Model): 
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Ordered', 'Ordered'),
+        ('Shipped', 'Shipped'),
+        ('Cancelled', 'Cancelled'),
+        ('Refunded', 'Refunded'),
+    ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=True, blank=True)
     #order_id = models.AutoField(max_length=50)
-    
-    date_added = models.DateTimeField(auto_now_add=True)
     shipping_address = models.CharField(max_length=200,default="", blank=True)
     phone = models.CharField(max_length=20, default="",blank=True)
 
     #訂單狀態
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES,default='ordered')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES,default='Ordered')
     
     # 訂單狀態變更日期
+    date_added = models.DateTimeField(auto_now_add=True)
     shipment_date = models.DateTimeField(null=True, blank=True)
     cancellation_date = models.DateTimeField(null=True, blank=True)
-    ticket_issue_date = models.DateTimeField(null=True, blank=True)
     refund_date = models.DateTimeField(null=True, blank=True)
     
     class Meta:
@@ -40,12 +32,16 @@ class Order(models.Model):
     
     # 在 Order 模型的 save() 方法中
     def save(self, *args, **kwargs):
-        if self.status == Order.SHIPPED and not self.shipment_date:
+        if self.status == 'Shipped' and not self.shipment_date:
             self.shipment_date = timezone.now()
-        elif self.status == Order.CANCELLED and not self.cancellation_date:
+            self.cancellation_date = None
+            self.refund_date = None
+        elif self.status == 'Cancelled' and not self.cancellation_date:
             self.cancellation_date = timezone.now()
-        elif self.status == Order.REFUNDED and not self.refund_date:
+            self.shipment_date = None
+        elif self.status == 'Refunded' and not self.refund_date:
             self.refund_date = timezone.now()
+            self.shipment_date = None
     # 其他狀態同理
 
         if not self.pk:  # 連接shipping_address=member.address

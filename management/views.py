@@ -4,6 +4,7 @@ from order.models import Order,OrderItem
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
+from django.shortcuts import redirect
 
 from django import forms
 from django_ckeditor_5.widgets import CKEditor5Widget
@@ -25,7 +26,7 @@ OrderItemFormSet = inlineformset_factory(Order,OrderItem,
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = [  'category','name', 'price', 'description','is_show','is_sale']  # 依需調整字段
+        fields = ('category','name', 'price', 'description','is_show','stock') # 依需調整字段
         widgets = {
             'description': CKEditor5Widget(
                 attrs={"class": "django_ckeditor_5"}, 
@@ -75,17 +76,6 @@ class ProductUpdateView(LoginRequiredMixin,UpdateView):
         else:
             context['image_formset'] = ProductImageFormSet(instance=self.object)
         return context
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        image_formset = context['image_formset']
-        if image_formset.is_valid():
-            self.object = form.save()
-            image_formset.instance = self.object
-            image_formset.save()
-            return super().form_valid(form)
-        else:
-            return self.form_invalid(form)
     
 class AddProductView(LoginRequiredMixin,CreateView):
     model = Product
@@ -102,18 +92,6 @@ class AddProductView(LoginRequiredMixin,CreateView):
         else:
             context['image_formset'] = ProductImageFormSet()
         return context
-    
-    def form_valid(self, form):
-        form.instance.vendor = self.request.user
-        context = self.get_context_data()
-        image_formset = context['image_formset']
-        if image_formset.is_valid():
-            self.object = form.save()  # 先保存 Product
-            image_formset.instance = self.object
-            image_formset.save()
-            return super().form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 class ProductDeleteView(LoginRequiredMixin,DeleteView):
     model = Product
@@ -143,7 +121,6 @@ class OrderUpdateView(LoginRequiredMixin,UpdateView):
         return HttpResponseForbidden('')
     
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
         context['order'] = self.object  # 傳遞訂單對象到模板
         context['customer_name'] = self.object.user.get_full_name()  # 獲取用戶全名
@@ -158,14 +135,3 @@ class OrderUpdateView(LoginRequiredMixin,UpdateView):
         return context
         #context['items'] = self.object.items.all()
         #return context
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        orderitem_formset = context['orderitem_formset']
-        if orderitem_formset.is_valid():
-            self.object = form.save()
-            orderitem_formset.instance = self.object
-            orderitem_formset.save()
-            return super().form_valid(form)
-        else:
-            return self.form_invalid(form)
