@@ -27,7 +27,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_sale = models.BooleanField(verbose_name="hide product",default=False)
     is_show = models.BooleanField(verbose_name="show/hide product",default=True)
-    stock = models.PositiveIntcegerField(null=False,blank=False)
+    stock = models.PositiveIntegerField(null=False,blank=False)
 
     def instock(self):
         return self.stock

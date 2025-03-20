@@ -179,8 +179,8 @@ CKEDITOR_5_CUSTOM_CSS = 'path_to.css' # optional
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': {
-            'items': ['heading', '|', 'bold', 'italic', 'link',
-                      'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+            'items': ['heading', '|', 'bold', 'italic', 'fontSize', 'fontFamily', 'fontColor', 'link',
+                      'bulletedList', 'numberedList', 'blockQuote', 'imageUpload']
                     }
 
     },
