@@ -84,43 +84,50 @@
       </div>
 
 
-
       <div class="recommended-section">
         <h2>Related recommended products</h2>
-        <div class="recommended-wrapper">
+        <div class="row">
           {% for p in category_products %}
-          <div class="recommended-item">
+          <div class="col-4">
             <a href="{% url 'product_detail' p.slug %}">
               {% with image=p.images.first %}
-                {% if image %}
-                  {# 优先显示缩略图，若无则显示原图 #}
-                  <img src="{% if image.thumbnail %}{{ image.thumbnail.url }}{% else %}{{ image.image.url }}{% endif %}"
+                {% if image and image.thumbnail %}
+                  <img src="{{ image.thumbnail.url }}" 
                        alt="{{ p.name }}"
-                       class="recommended-thumbnail">
+                       class="product-thumbnail"
+                       style="width: 350px; height: 350px; object-fit: cover; display: block; margin: 0 auto;"> <!-- 新增固定尺寸样式 -->
                 {% else %}
                   <img src="{% static 'img/default-thumbnail.jpg' %}" 
                        alt="No Image"
-                       class="recommended-thumbnail">
+                       class="product-thumbnail"
+                       style="width: 350px; height: 2350px; object-fit: cover; display: block; margin: 0 auto;"> <!-- 保持相同样式 -->
                 {% endif %}
               {% endwith %}
-              <div class="recommended-info">
-                <h4>{{ p.name|truncatechars:20 }}</h4>
-                <p class="price">
-                  ${{ p.price }}
-                  {% if p.is_sale %}
-                  <span class="sale-badge">Specials</span>
-                  {% endif %}
-                </p>
-              </div>
             </a>
+            <div class="product-info">
+              <h4>{{ p.name|truncatechars:20 }}</h4>
+              <p class="price">
+                ${{ p.price }}
+                {% if p.is_sale %}
+                <span class="sale-badge">Specials</span>
+                {% endif %}
+              </p>
+            </div>
           </div>
           {% empty %}
-          <p class="no-recommendations">No recommended products</p>
+          <div class="col-12">
+            <p>No recommended products found.</p>
+          </div>
           {% endfor %}
         </div>
       </div>
 
-      
+
+
+
+
+
+
 
     </div>
   </div>
