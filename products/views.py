@@ -15,16 +15,28 @@ def product_list(request):
     
 
 
+# views.py 修改部分
 def product_detail(request,slug):
     product= get_object_or_404(Product.objects.prefetch_related('images'), slug=slug)
-        # 新增：获取同分类商品（排除当前商品）
-    category_products = Product.objects.filter(
+    
+    # 获取同分类商品（排除当前商品）
+    same_category = Product.objects.filter(
         category=product.category,
         is_show=True
-    ).exclude(id=product.id).prefetch_related('images')[:4]  # 限制4个推荐商品
+    ).exclude(id=product.id).prefetch_related('images')
+    
+    # 获取其他分类商品（当同分类不足4个时补充）
+    other_category = Product.objects.exclude(
+        category=product.category
+    ).exclude(id=product.id).filter(is_show=True).prefetch_related('images')
+    
+    # 合并两个查询集并限制4个
+    category_products = list(same_category[:4]) 
+    if len(category_products) < 4:
+        needed = 4 - len(category_products)
+        category_products += list(other_category[:needed])
     
     return render(request, 'products/product_detail.html', {
         'product': product,
-        'category_products': category_products  # 添加推荐商品到上下文
+        'category_products': category_products[:4]  # 确保最多4个
     })
-
