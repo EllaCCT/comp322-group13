@@ -18,7 +18,7 @@ def register(request):
         user = form.save()
         address = form.cleaned_data.get('address', '')  # 假設表單有 address 字段
         Member.objects.create(user=user, email=user.email, address=address)
-        login(request, user)
+        login_auth(request, user)
         return redirect('index')
     
     #context = { 'form': form}

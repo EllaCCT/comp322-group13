@@ -1,4 +1,4 @@
-<!--{% extends 'base.html' %}-->
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Vendor Order List{% endblock %}
@@ -10,7 +10,7 @@
 
     <div class="search-box">
         <form action="." method="GET">
-            <input type="text" 
+            <input type="text"      
                 name="query" 
                 placeholder="Search by order ID or Name" 
                 value="{{ request.GET.query}}">

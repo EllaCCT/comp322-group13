@@ -17,4 +17,14 @@ def product_list(request):
 
 def product_detail(request,slug):
     product= get_object_or_404(Product.objects.prefetch_related('images'), slug=slug)
-    return render(request, 'products/product_detail.html',{'product':product})
+        # 新增：获取同分类商品（排除当前商品）
+    category_products = Product.objects.filter(
+        category=product.category,
+        is_show=True
+    ).exclude(id=product.id).prefetch_related('images')[:4]  # 限制4个推荐商品
+    
+    return render(request, 'products/product_detail.html', {
+        'product': product,
+        'category_products': category_products  # 添加推荐商品到上下文
+    })
+

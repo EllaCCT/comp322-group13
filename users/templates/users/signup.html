@@ -1,11 +1,90 @@
+<!-- templates/users/signup.html -->
+{% extends "base.html" %}
+{% load static %}
+
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    
-<button type="submit">Sign up</button>
-</form>
+
+<div class="Login-page">
+    <div class="container">
+        <div class="row">
+
+
+
+            <div class="col-2">
+                <div class="form-container" style="height: 450px;">
+                    <div class="form-btn">
+                        <a>Sign Up</a>
+                    </div>
+
+                    <form method="post" style="
+                    right: 0px;
+                    left: 0px;
+                    top: 80px;">
+                        {% csrf_token %}
+                        
+                        {# 错误信息显示 #}
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {# 用户名 #}
+                        <div class="form-group">
+                            <input type="text" class="form-control" 
+                                   name="username" 
+                                   placeholder="Username"
+                                   value="{{ form.username.value|default:'' }}">
+                        </div>
+
+                        {# 电子邮件 #}
+                        <div class="form-group">
+                            <input type="email" class="form-control" 
+                                   name="email" 
+                                   placeholder="Email"
+                                   value="{{ form.email.value|default:'' }}">
+                        </div>
+
+                        {# 地址 #}
+                        <div class="form-group">
+                            <input type="text" class="form-control" 
+                                   name="address" 
+                                   placeholder="Address"
+                                   value="{{ form.address.value|default:'' }}">
+                        </div>
+
+                        {# 密码 #}
+                        <div class="form-group">
+                            <input type="password" class="form-control" 
+                                   name="password1" 
+                                   placeholder="Password">
+                        </div>
+
+                        {# 确认密码 #}
+                        <div class="form-group">
+                            <input type="password" class="form-control" 
+                                   name="password2" 
+                                   placeholder="Confirm Password">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
+                        <br>
+                        <a href="{% url 'login' %}" style="
+                        font-size: 15px; ">Already have an account? Login here</a>
+                    </form>
+                </div>
+            </div>
+            <div class="col-2">
+                <img src="{% static 'img/homepage.webp' %}" alt="Homepage">   
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

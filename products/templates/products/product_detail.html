@@ -82,15 +82,144 @@
           </div>
         </div>
       </div>
+
+
+
+      <div class="recommended-section">
+        <h2>Related recommended products</h2>
+        <div class="recommended-wrapper">
+          {% for p in category_products %}
+          <div class="recommended-item">
+            <a href="{% url 'product_detail' p.slug %}">
+              {% with image=p.images.first %}
+                {% if image %}
+                  {# 优先显示缩略图，若无则显示原图 #}
+                  <img src="{% if image.thumbnail %}{{ image.thumbnail.url }}{% else %}{{ image.image.url }}{% endif %}"
+                       alt="{{ p.name }}"
+                       class="recommended-thumbnail">
+                {% else %}
+                  <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                       alt="No Image"
+                       class="recommended-thumbnail">
+                {% endif %}
+              {% endwith %}
+              <div class="recommended-info">
+                <h4>{{ p.name|truncatechars:20 }}</h4>
+                <p class="price">
+                  ${{ p.price }}
+                  {% if p.is_sale %}
+                  <span class="sale-badge">Specials</span>
+                  {% endif %}
+                </p>
+              </div>
+            </a>
+          </div>
+          {% empty %}
+          <p class="no-recommendations">No recommended products</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      
+
     </div>
   </div>
 </div>
+
+
 {% endif %}
 {% endblock %}
 
 {% block extra_scripts %}
 
 <style>
+
+
+
+
+  .recommended-section {
+    margin-top: 50px;
+    padding: 25px 0;
+    border-top: 1px solid #eee;
+  }
+  
+  .recommended-section h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .recommended-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .recommended-item {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .recommended-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .recommended-thumbnail {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .recommended-info {
+    padding: 15px;
+  }
+  
+  .recommended-info h4 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .price {
+    font-size: 18px;
+    color: #d31820;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .sale-badge {
+    background: #d31820;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  @media (max-width: 768px) {
+    .recommended-wrapper {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    
+    .recommended-thumbnail {
+      height: 150px;
+    }
+  }
+
+
+  
+
+
+
 /* 产品描述优化样式 */
 .product-description-container {
   margin: 50px 0;
@@ -217,13 +346,7 @@
   }
 }
 
-/* 懸停效果 */
-@media (hover: hover) {
-  .rich-content-wrapper img:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  }
-}
+
 </style>
 
 <script>
