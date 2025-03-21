@@ -84,43 +84,37 @@
       </div>
 
 
-      <div class="recommended-section">
-        <h2>Related recommended products</h2>
-        <div class="row">
-          {% for p in category_products %}
-          <div class="col-4">
-            <a href="{% url 'product_detail' p.slug %}">
-              {% with image=p.images.first %}
-                {% if image and image.thumbnail %}
-                  <img src="{{ image.thumbnail.url }}" 
-                       alt="{{ p.name }}"
-                       class="product-thumbnail"
-                       style="width: 350px; height: 350px; object-fit: cover; display: block; margin: 0 auto;"> <!-- 新增固定尺寸样式 -->
-                {% else %}
-                  <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                       alt="No Image"
-                       class="product-thumbnail"
-                       style="width: 350px; height: 2350px; object-fit: cover; display: block; margin: 0 auto;"> <!-- 保持相同样式 -->
-                {% endif %}
-              {% endwith %}
-            </a>
-            <div class="product-info">
-              <h4>{{ p.name|truncatechars:20 }}</h4>
-              <p class="price">
-                ${{ p.price }}
-                {% if p.is_sale %}
-                <span class="sale-badge">Specials</span>
-                {% endif %}
-              </p>
-            </div>
-          </div>
-          {% empty %}
-          <div class="col-12">
-            <p>No recommended products found.</p>
-          </div>
-          {% endfor %}
-        </div>
+<!-- 修改推荐商品部分 -->
+<div class="recommended-section">
+  <h2>Related recommended products</h2>
+  <div class="row">
+    {% for p in category_products %}
+    <div class="col-4">
+      <a href="{% url 'product_detail' p.slug %}">
+        {% with image=p.images.first %}
+          {% if image and image.thumbnail %}
+            <img src="{{ image.thumbnail.url }}" 
+                 alt="{{ p.name }}"
+                 class="product-thumbnail" style="width: 250px; height: 250px; object-fit: cover; display: block; margin: 0 auto;">  <!-- 移除内联样式 -->
+          {% else %}
+            <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                 alt="No Image"
+                 class="product-thumbnail" style="width: 350px; height: 350px; object-fit: cover; display: block; margin: 0 auto;">  <!-- 移除内联样式 -->
+          {% endif %}
+        {% endwith %}
+      </a>
+      <div class="product-info">
+        <h4>{{ p.name|truncatechars:20 }}</h4>
+        <p class="price">${{ p.price }}</p>
       </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <p>No recommended products found.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 
 
 
