@@ -20,8 +20,11 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductImageInline,]
 
     readonly_fields = ['id']
-    
-admin.site.register(Category)
+
+class CategoryAdmin(admin.ModelAdmin):
+    readonly_fields = ['slug']
+
+admin.site.register(Category, CategoryAdmin)
 #admin.site.register(Product,ProductAdmin)
 #admin.site.register(ProductImage)
 

@@ -55,28 +55,24 @@
 
       <!-- 产品列表 -->
       <div class="row">
-        {% for product in products %}
+        {% for product in products %}        
         <div class="col-4" 
              data-price="{% if product.on_sale %}{{ product.sale_price }}{% else %}{{ product.price }}{% endif %}">
           <a href="{% url 'product_detail' product.slug %}">
-            {% with image=product.images.first %}
-              {% if image and image.thumbnail %}
-                <img src="{{ image.thumbnail.url }}" 
+              {% if product.thumbnail %}
+                <img src="{{ product.thumbnail.url }}" 
                      alt="{{ product.name }}"
                      class="product-thumbnail">
               {% else %}
                 <img src="{% static 'img/default-thumbnail.jpg' %}" 
                      alt="No Image"
                      class="product-thumbnail">
-              {% endif %}
-            {% endwith %}
+              {% endif %}            
           </a>
           <h4>{{ product.name }}</h4>
-          {% if product.on_sale %}
-          <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
-          {% else %}
+          
           <p class="price">${{ product.price }}</p>
-          {% endif %}
+         
         </div>
         {% empty %}
         <div class="col-12">

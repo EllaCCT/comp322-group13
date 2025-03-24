@@ -1,0 +1,407 @@
+<!-- templates/users/product.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="small-container">
+  <div class="top-controls">
+    <h2 style="color: #223a77; margin-bottom: 20px;">
+      {% if active_category %}{{ active_category.name }}{% else %}All Products{% endif %}
+    </h2>
+
+    <div class="controls-wrapper">
+      <!-- 搜索和按钮容器 -->
+      <div class="header-row">
+        <div class="search-box">
+          <form action="." method="GET">
+            <input type="text" 
+                   name="query" 
+                   placeholder="Search toys..." 
+                   value="{{ request.GET.query }}">
+            <button type="submit" style="display:none"></button>
+          </form>
+        </div>
+        <button class="mobile-filter-btn" id="toggleFilters">☰</button>
+      </div>
+
+      <!-- 价格筛选 -->
+      <div class="price-filter">
+        <input type="number" 
+               id="minPrice" 
+               placeholder="Min price" 
+               min="0"
+               step="any">
+        <span>-</span>
+        <input type="number" 
+               id="maxPrice" 
+               placeholder="Max price" 
+               min="0"
+               step="any">
+        <button class="filter-btn" onclick="validateAndFilter()">Filter</button>
+      </div>
+
+      <!-- 分类下拉菜单 -->
+      <select class="custom-select" onchange="window.location.href=this.value;">
+        <option value="{% url 'product' %}">All Categories</option>
+        {% for category in categories %}
+        <option value="?category={{ category.slug }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}"
+                {% if category.slug == request.GET.category %}selected{% endif %}>
+            {{ category.name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <!-- 产品列表 -->
+  <div class="row">
+    {% for product in products %}
+    <div class="col-4" data-price="{% if product.is_sale %}{{ product.sale_price }}{% else %}{{ product.price }}{% endif %}">
+      <a href="{% url 'product_detail' product.slug %}">
+          {% if product.thumbnail %}
+            <img src="{{ product.thumbnail.url }}" 
+                 alt="{{ product.name }}"
+                 class="product-thumbnail" 
+                 style="width: 200px; height: 200px; object-fit: cover; display: block; margin: 0 auto;">
+          {% else %}
+            <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                 alt="No Image"
+                 class="product-thumbnail">
+          {% endif %}
+      </a>
+      <h4>{{ product.name }}</h4>
+      {% if product.is_sale %}
+      <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
+      {% else %}
+      <p class="price">${{ product.price }}</p>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <p>No products found.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- View More 按钮 -->
+  <div class="view-more-container">
+    <button id="viewMoreBtn" class="view-more-btn">View More</button>
+  </div>
+</div>
+
+<style>
+/* View More 样式 */
+.view-more-container {
+  text-align: center;
+  margin: 40px 0;
+  padding-top: 30px;
+  border-top: 1px solid #eee;
+}
+
+.view-more-btn {
+  background-color: #223a77;
+  color: white;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  display: none; /* 默认隐藏 */
+}
+
+.view-more-btn:hover {
+  background-color: #1a2d5a;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+/* 产品显示控制 */
+.row .col-4 {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.row .col-4.visible {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.pagination-info {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+}
+
+.pagination-controls {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.page-item {
+  display: block;
+  padding: 10px 16px;
+  border: 2px solid #223a77;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #223a77;
+  min-width: 40px;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.page-item:hover {
+  background: #223a77;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(34, 58, 119, 0.2);
+}
+
+.current-page {
+  background: #223a77;
+  color: white;
+  border-color: #223a77;
+  pointer-events: none;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .page-item {
+    padding: 8px 12px;
+    min-width: 36px;
+  }
+  
+  .pagination-controls {
+    gap: 5px;
+  }
+}
+
+    .error-alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff4444;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .top-controls {
+      margin-bottom: 30px;
+    }
+
+    .controls-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      height: 38px;
+      box-sizing: border-box;
+    }
+
+    .mobile-filter-btn {
+      display: none;
+      background: #223a77;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      height: 38px;
+      min-width: 40px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .price-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .price-filter input {
+      width: 100px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      height: 38px;
+    }
+
+    .filter-btn {
+      background: #223a77;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      height: 38px;
+      cursor: pointer;
+    }
+
+    .custom-select {
+      padding: 0 15px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      height: 38px;
+      min-width: 160px;
+    }
+
+    @media (max-width: 768px) {
+      .controls-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+      }
+
+      .header-row {
+        max-width: none;
+        width: 100%;
+        order: -1;
+      }
+
+      .mobile-filter-btn {
+        display: block;
+      }
+
+      .price-filter,
+      .custom-select {
+        display: none !important;
+      }
+
+      .controls-wrapper.active .price-filter,
+      .controls-wrapper.active .custom-select {
+        display: flex !important;
+      }
+
+      .price-filter input {
+        width: 100%;
+      }
+
+      .custom-select {
+        width: 100%;
+      }
+    }
+    </style>
+
+    <script>
+
+      // View More 功能
+document.addEventListener('DOMContentLoaded', function() {
+  const products = Array.from(document.querySelectorAll('.col-4'));
+  const itemsPerLoad = 4;
+  let currentVisible = 0;
+  const viewMoreBtn = document.getElementById('viewMoreBtn');
+
+  // 初始化显示
+  function initProducts() {
+    products.forEach((product, index) => {
+      if(index < itemsPerLoad) {
+        product.classList.add('visible');
+        currentVisible++;
+      }
+    });
+    updateButton();
+  }
+
+  // 更新按钮状态
+  function updateButton() {
+    if(currentVisible >= products.length) {
+      viewMoreBtn.style.display = 'none';
+    } else {
+      viewMoreBtn.style.display = 'block';
+    }
+  }
+
+  // 点击加载更多
+  if(viewMoreBtn) {
+    viewMoreBtn.addEventListener('click', function() {
+      const remaining = products.length - currentVisible;
+      const showCount = Math.min(remaining, itemsPerLoad);
+      
+      for(let i = currentVisible; i < currentVisible + showCount; i++) {
+        if(products[i]) products[i].classList.add('visible');
+      }
+      
+      currentVisible += showCount;
+      updateButton();
+    });
+  }
+
+  initProducts();
+});
+
+    // 手机筛选切换
+    document.getElementById('toggleFilters').addEventListener('click', function(e) {
+      e.preventDefault();
+      const wrapper = document.querySelector('.controls-wrapper');
+      wrapper.classList.toggle('active');
+      this.textContent = wrapper.classList.contains('active') ? '✕' : '☰';
+    });
+
+    // 价格筛选功能
+    function validateAndFilter() {
+      const min = parseFloat(document.getElementById('minPrice').value) || 0;
+      const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+      
+      if (min > max) {
+        showError('Error: Minimum value cannot be greater than maximum value');
+        return;
+      }
+
+      filterByPrice(min, max);
+    }
+
+    function filterByPrice(min, max) {
+      document.querySelectorAll('.col-4').forEach(product => {
+        const price = parseFloat(product.dataset.price);
+        product.style.display = (price >= min && price <= max) ? 'block' : 'none';
+      });
+    }
+
+    // 显示错误提示
+    function showError(message) {
+      const existingAlert = document.querySelector('.error-alert');
+      if(existingAlert) existingAlert.remove();
+
+      const alertBox = document.createElement('div');
+      alertBox.className = 'error-alert';
+      alertBox.textContent = message;
+      document.body.appendChild(alertBox);
+      
+      setTimeout(() => {
+        alertBox.remove();
+      }, 3000);
+    }
+    </script>
+{% endblock %}

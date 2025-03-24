@@ -1,4 +1,4 @@
-<!--{% extends 'base.html' %}-->
+{% extends 'base.html' %}
 {% load static %}
 {% block content %}
 {% csrf_token %}
@@ -8,7 +8,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     {{ form.media }} 
-    <input type=submit value="Save changes">
+    
 
     <h3>Product Images</h3>
     {{ image_formset.management_form }}
@@ -19,15 +19,15 @@
         <th>{{ form.image.label_tag }} </th>
         <td>{{ form.image }}</td>
         
-        <!-- 添加缩略图上传字段 -->
+        <!-- 添加缩略图上传字段
         <th>{{ form.thumbnail.label_tag }} </th>
-        <td>{{ form.thumbnail }}</td>
+        <td>{{ form.thumbnail }}</td>-->
         </tr>
         </table>
     </div>
     {% endfor %}
     
-    <input type="submit" value="Save Productimages">
+    <input type="submit" value="Save Product">
     <a href="{% url "vendor_product_list" %}"> <---Back to list</a>
 </form>
 {% endblock %}

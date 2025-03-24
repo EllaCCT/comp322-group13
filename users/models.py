@@ -14,8 +14,3 @@ class Member(models.Model):
   
   def __str__(self):
     return str(self.user)
-  
-  @receiver(post_save, sender=User)
-  def _post_save_receiver(sender, instance, created, **kwargs):
-    if created:
-      Member.objects.create(user=instance)

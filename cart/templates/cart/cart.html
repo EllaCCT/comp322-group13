@@ -4,12 +4,12 @@
 {% block content %}
 
 <div class="cart-container">
-  {% if cart.items %}
+{% if cart.items %}
 
   <div class="cart-header-row">
     <div class="header-product">Product</div>
     <div class="header-quantity" style="    padding-left: 70px;">Quantity</div>
-    <div class="header-subtotal"style="    padding-right: 40px;">Price</div>
+    <div class="header-subtotal"style="   wf padding-right: 40px;">Price</div>
     <div class="header-action">  </div>
   </div>
 
@@ -18,9 +18,9 @@
     <div class="cart-item">
       <div class="item-info">
         <a href="{% url 'product_detail' item.product.slug %}" class="product-link">
-          {% if item.product.images.first.thumbnail %}
+          {% if item.product.thumbnail %}
             <img class="item-thumbnail" 
-                 src="{{ item.product.images.first.thumbnail.url }}" 
+                 src="{{ item.product.thumbnail.url }}" 
                  alt="{{ item.product.name }}">
           {% else %}
             <div class="thumbnail-placeholder">No Image</div>

@@ -1,4 +1,4 @@
-<!--{% extends 'base.html' %}-->
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Vendor Product List{% endblock %}
@@ -30,10 +30,17 @@
         <th>Price</th>
         <th>State</th>
         <th>Actions</th>
-    </tr>
+    </tr>         
     {% for product in object_list %}
     <tr>
-        <td><img src="{{product.images.first.thumbnail.url}}"></td>
+        {% if product.thumbnail %}
+        <td><img src="{{product.thumbnail.url}}"></td>
+        {% else %}
+                <td><img src="{% static 'img/default-thumbnail.jpg' %}" 
+                     alt="No Image"
+                     class="product-thumbnail">
+                </td>
+              {% endif %}
         <td>{{product.id}}</td>
         <td><a href="{% url "product_update" product.id %}">{{product.name}}</a></td>
         <td>{{product.price}}</td>

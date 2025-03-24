@@ -59,10 +59,11 @@ class Cart(object):
 
             total_price = product.price * item_data['quantity']
 
-            thumbnail = None
-            product_image = product.images.first()  # 使用反向關聯名稱 'images'
-            if product_image and product_image.thumbnail:
-                thumbnail = product_image.thumbnail.url
+            thumbnail = product.thumbnail
+            # product_image = product.images.first()  # 使用反向關聯名稱 'images'
+            # if product_image and product_image.thumbnail:
+                # thumbnail = product_image.thumbnail.url
+
 
             items.append({
                 'id': product_id,

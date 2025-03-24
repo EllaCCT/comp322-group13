@@ -16,9 +16,9 @@ class ProductImageInline(admin.TabularInline):
 # Register your models here.
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id','name','price','is_show','is_sale')
+    list_display = ('id','name','price','is_show')
     search_fields = ('id','name')
-    list_editable = ('is_show','is_sale')
+    list_editable = ('is_show',)
     inlines = [ProductImageInline,]
 
 class OrderAdmin(admin.ModelAdmin):
