@@ -37,22 +37,27 @@ product.name }}{% endblock %} {% block content %}
       <h1>{{ product.name }}</h1>
       <h4>${{ product.price }}</h4>
 
-      <form action="{% url 'add_to_cart' product.id %}" method="post">
+
+      <form action="{% url 'add_to_cart' product.id %}" method="post" id="add-to-cart-form">
         {% csrf_token %}
         <div class="form-group">
-          <label>Select category</label>
-          <select name="variant" class="variant-select">
-            <option value=" {{ product.id }}" data-price="{{ product.price }}">
+          <label>Select variant</label>
+          <select name="product_id" class="variant-select">
+            <option value="{{ product.id }}" 
+                    data-price="{{ product.price }}"
+                    data-image="{% if product.thumbnail %}{{ product.thumbnail.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}">
               {{product.name}} - ${{product.price}}
             </option>
             {% for variant in product.variants.all %}
-            <option value="{{ variant.id }}" data-price="{{ variant.price }}" {% if variant.image %} data-image="{{ variant.thumbnail.url }}" {% endif %}>
+            <option value="{{ variant.id }}" 
+                    data-price="{{ variant.price }}" 
+                    data-image="{% if variant.thumbnail %}{{ variant.thumbnail.url }}{% elif variant.images.first %}{{ variant.images.first.image.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}">
               {{ variant.name }} - ${{ variant.price }}
             </option>
             {% endfor %}
           </select>
         </div>
-
+      
         <div class="form-group">
           <label>quantity：</label>
           <input
@@ -65,7 +70,7 @@ product.name }}{% endblock %} {% block content %}
             style="width: 80px; padding: 8px"
           />
         </div>
-
+      
         <button type="submit" class="btn">Add to Cart</button>
       </form>
     </div>
@@ -388,9 +393,42 @@ product.name }}{% endblock %} {% block content %}
       border-radius: 0;
     }
   }
+
+
+
+
+  #product-img {
+    transition: opacity 0.3s ease-in-out;
+} 
 </style>
 
 <script>
+
+
+
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const variantSelect = document.querySelector('.variant-select');
+    const mainImage = document.getElementById('product-img');
+
+    variantSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const newImage = selectedOption.getAttribute('data-image');
+        
+        // 添加淡出效果
+        mainImage.style.opacity = 0;
+        setTimeout(() => {
+            mainImage.src = newImage;
+            mainImage.style.opacity = 1;
+        }, 300); // 300毫秒后切换图片并恢复透明度
+    });
+});
+
+
+
+
+
   // 款式选择互动功能
   document
     .querySelector(".variant-select")

@@ -38,11 +38,12 @@ def remove_from_cart(request, product_id):
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
-    product = Product.objects.get(id=product_id)
+    # 获取用户实际选择的产品ID（可能是变体）
+    selected_product_id = request.POST.get('product_id', product_id)
+    product = get_object_or_404(Product, id=selected_product_id)
     quantity = int(request.POST.get('quantity', 1)) 
     cart.add(product, quantity=quantity)
     return redirect('cart')
-
 @login_required
 def checkout(request):
     cart = Cart(request)

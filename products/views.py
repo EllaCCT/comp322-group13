@@ -24,7 +24,7 @@ def product_list(request):
     return render(request, 'products/product.html', {'products': products})
 
 def product_detail(request,slug):
-    product= get_object_or_404(Product.objects.prefetch_related('images'), slug=slug)
+    product= get_object_or_404(Product.objects.prefetch_related('images', 'variants__images', ), slug=slug)
     
     if product.parent:
         return redirect('', slug=product.parent.slug)

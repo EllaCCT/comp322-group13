@@ -17,7 +17,7 @@
     {% for item in cart.items %}
     <div class="cart-item">
       <div class="item-info">
-        <a href="{% url 'product_detail' item.product.slug %}" class="product-link">
+        <a href="{% if item.product.parent %}{% url 'product_detail' item.product.parent.slug %}{% else %}{% url 'product_detail' item.product.slug %}{% endif %}" class="product-link">
           {% if item.product.thumbnail %}
             <img class="item-thumbnail" 
                  src="{{ item.product.thumbnail.url }}" 
@@ -27,7 +27,7 @@
           {% endif %}
         </a>
         <div class="item-details">
-          <a href="{% url 'product_detail' item.product.slug %}" class="product-link">
+          <a href="{% if item.product.parent %}{% url 'product_detail' item.product.parent.slug %}{% else %}{% url 'product_detail' item.product.slug %}{% endif %}" class="product-link">
             <h3>{{ item.product.name }}</h3>
           </a>
           <p class="item-price">
