@@ -82,128 +82,144 @@
                 padding-top: 0;
             }
         }
+
+        /* 新增的页脚固定样式（不修改原有CSS） */
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .page-content {
+            flex: 1 0 auto;
+        }
+        .footer {
+            flex-shrink: 0;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    <div class="page-content">
+        <!-- 公共Header部分 -->
+        <div class="header">
+          <div class="container">
+            <div class="navbar">
+              <div class="logo">
+                <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
+              </div>
 
-<!-- 公共Header部分 - 整合新版用户权限逻辑 -->
-<div class="header">
-  <div class="container">
-    <div class="navbar">
-      <div class="logo">
-        <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
-      </div>
+              <nav>
+                <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
+                <ul id="MenuItems">
+                  {% if user.is_superuser %}
+                  <li><a href="{% url 'index' %}">Home</a></li>
+                  <li><a href="{% url 'vendor_product_list' %}">Product management</a></li>
+                  <li><a href="{% url 'vendor_order_list' %}">Order management</a></li>
+                  {% else %}
+                  <li><a href="{% url 'index' %}">Home</a></li>
+                  <li><a href="{% url 'product' %}">Products</a></li>
+                  <li><a href="{% url 'order_list' %}">Order</a></li>
+                  <li><a href="">Contact</a></li>
+                  {% endif %}
 
-      <nav>
-        <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
-        <ul id="MenuItems">
-          {% if user.is_superuser %}
-          <li><a href="{% url 'index' %}">Home</a></li>
-          <li><a href="{% url 'vendor_product_list' %}">Product management</a></li>
-          <li><a href="{% url 'vendor_order_list' %}">Order management</a></li>
-          {% else %}
-          <li><a href="{% url 'index' %}">Home</a></li>
-          <li><a href="{% url 'product' %}">Products</a></li>
-          <li><a href="{% url 'order_list' %}">Order</a></li>
-          <li><a href="#">Contact</a></li>
-          {% endif %}
+                  {% if user.is_authenticated %}
+                  <li><a href="#" style="color: #2b2a69;">Hi, {{ user.username }}</a></li>
+                  <li>
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" style="color: #2b2a69; background:none; border:none; padding:0;">Logout</button>
+                    </form>
+                  </li>
+                  {% else %}
+                  <li><a href="{% url 'login' %}">Login</a></li>
+                  {% endif %}
+                  
+                  {% if not user.is_superuser %}
+                  <li>
+                    <a href="{% url 'cart' %}" class="cart-link">
+                      <img src="{% static 'img/car.png' %}" 
+                           width="15" 
+                           height="15" 
+                           alt="Cart"
+                           style="vertical-align: middle;">
+                      <span class="cart-quantity">{{ cart_quantity }}</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
 
-          {% if user.is_authenticated %}
-          <li><a href="#" style="color: #2b2a69;">Hi, {{ user.username }}</a></li>
-          <li>
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
-              {% csrf_token %}
-              <button type="submit" style="color: #2b2a69; background:none; border:none; padding:0;">Logout</button>
-            </form>
-          </li>
-          {% else %}
-          <li><a href="{% url 'login' %}">Login</a></li>
-          {% endif %}
-          
-          {% if not user.is_superuser %}
-          <li>
-            <a href="{% url 'cart' %}" class="cart-link">
-              <img src="{% static 'img/car.png' %}" 
-                   width="15" 
-                   height="15" 
-                   alt="Cart"
-                   style="vertical-align: middle;">
-              <span class="cart-quantity">{{ cart_quantity }}</span>
-            </a>
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
+            {% block header_content %}{% endblock %}
+          </div>
+        </div>
+
+        <!-- 主要內容區塊 -->
+        <div class="content-section">
+        {% block content %}{% endblock %}
+        </div>
     </div>
 
-    {% block header_content %}{% endblock %}
-  </div>
-</div>
-
-<!-- 主要內容區塊 - 保留舊版內容容器 -->
-<div class="content-section">
-{% block content %}{% endblock %}
-</div>
-
-<!-- 公共Footer -->
-<div class="footer">
-  <div class="container">
-    <div class="row">
-      <div class="footer-col-2">
-        <img src="{% static 'img/logo-receipt_400x.avif' %}" alt="Footer Logo">
-        <p>For almost thirty years, we have proudly built our family-owned neighborhood toy store around outstanding quality, value, customer service, and heart.</p>
+    <!-- 公共Footer -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="footer-col-2">
+            <img src="{% static 'img/logo-receipt_400x.avif' %}" alt="Footer Logo">
+            <p>For almost thirty years, we have proudly built our family-owned neighborhood toy store around outstanding quality, value, customer service, and heart.</p>
+          </div>
+        </div>
+        <hr>
+        <p>This website was created by MPU ISI Group 13</p>
       </div>
     </div>
-    <hr>
-    <p>This website was created by MPU ISI Group 13</p>
-  </div>
-</div>
 
-<!-- 整合舊版改進的JavaScript邏輯 -->
-<script>
-    let isMenuOpen = false;
-    const menu = document.getElementById('MenuItems');
+    <!-- JavaScript -->
+    <script>
+        let isMenuOpen = false;
+        const menu = document.getElementById('MenuItems');
 
-    function menutoggle() {
-      isMenuOpen = !isMenuOpen;
-      if (isMenuOpen) {
-          menu.style.maxHeight = menu.scrollHeight + "px";
-          menu.classList.add('show-menu');
-      } else {
-          menu.style.maxHeight = "0";
-          menu.classList.remove('show-menu');
-      }
-    }
-
-    function updateContentPadding() {
-        const content = document.querySelector('.content-section');
-        if (window.innerWidth <= 800) {
-            content.style.paddingTop = '60px';
-        } else {
-            content.style.paddingTop = '';
+        function menutoggle() {
+          isMenuOpen = !isMenuOpen;
+          if (isMenuOpen) {
+              menu.style.maxHeight = menu.scrollHeight + "px";
+              menu.classList.add('show-menu');
+          } else {
+              menu.style.maxHeight = "0";
+              menu.classList.remove('show-menu');
+          }
         }
-    }
 
-    updateContentPadding();
-    window.addEventListener('resize', updateContentPadding);
-
-    document.addEventListener('click', function(event) {
-        const isClickInsideMenu = menu.contains(event.target);
-        const isClickOnIcon = event.target.closest('.menu-icon');
-
-        if (isMenuOpen && !isClickInsideMenu && !isClickOnIcon) {
-            menutoggle();
+        function updateContentPadding() {
+            const content = document.querySelector('.content-section');
+            if (window.innerWidth <= 800) {
+                content.style.paddingTop = '60px';
+            } else {
+                content.style.paddingTop = '';
+            }
         }
-    });
 
-    window.addEventListener('scroll', function() {
-        if (isMenuOpen && window.innerWidth <= 800) {
-            menutoggle();
-        }
-    });
-</script>
+        updateContentPadding();
+        window.addEventListener('resize', updateContentPadding);
 
-{% block extra_scripts %}{% endblock %}
+        document.addEventListener('click', function(event) {
+            const isClickInsideMenu = menu.contains(event.target);
+            const isClickOnIcon = event.target.closest('.menu-icon');
+
+            if (isMenuOpen && !isClickInsideMenu && !isClickOnIcon) {
+                menutoggle();
+            }
+        });
+
+        window.addEventListener('scroll', function() {
+            if (isMenuOpen && window.innerWidth <= 800) {
+                menutoggle();
+            }
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

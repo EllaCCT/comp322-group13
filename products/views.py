@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from products.models import Product, Category
 # Create your views here.
 from django.views.generic import DetailView
+from django.shortcuts import redirect
 
 #class ProductDetailView(DetailView):
     #model = Product
@@ -19,14 +20,18 @@ from django.views.generic import DetailView
     #return render(request, 'products/product_detail.html',{'product':product})
 
 def product_list(request):
-    products = Product.objects.filter(is_show=True).prefetch_related('images')
+    products = Product.objects.filter(parent=None).filter(is_show=True).prefetch_related('images')
     return render(request, 'products/product.html', {'products': products})
 
 def product_detail(request,slug):
     product= get_object_or_404(Product.objects.prefetch_related('images'), slug=slug)
     
+    if product.parent:
+        return redirect('', slug=product.parent.slug)
+    
     # 获取同分类商品（排除当前商品）
     same_category = Product.objects.filter(
+        parent=None,
         category=product.category,
         is_show=True
     ).exclude(id=product.id).prefetch_related('images')

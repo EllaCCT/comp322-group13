@@ -1,36 +1,37 @@
 <!-- templates/users/product_detail.html -->
- 
-{% extends "base.html" %}
-{% load static %}
 
-{% block title %}ISI STORE | {{ product.name }}{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block title %}ISI STORE | {{
+product.name }}{% endblock %} {% block content %}
 <div class="small-container single-product">
   <div class="row">
     <div class="col-2">
       <!-- 修改主圖片部分 -->
-      <img src="{% if product.images.first.image %}
+      <img
+        src="{% if product.images.first.image %}
                 {{ product.images.first.image.url }}
                 {% else %}
                 {% static 'img/default.jpg' %}
-                {% endif %}" width="100%" id="product-img">
-                
-        <!-- 修改小圖循環部分 -->
-      <div class="small-img-row">
-          {% for image in product.images.all %}
-          {% if image.image %}  <!-- 添加此條件判斷 -->
-          <div class="small-img-col">
-            <img src="{{ image.image.url }}" 
-                      width="100%" 
-                      class="small-img"
-                      onclick="changeMainImage(this)">
-          </div>
-          {% endif %}
-          {% endfor %}
-        </div>
-    </div>
+                {% endif %}"
+        width="100%"
+        id="product-img"
+      />
 
+      <!-- 修改小圖循環部分 -->
+      <div class="small-img-row">
+        {% for image in product.images.all %} {% if image.image %}
+        <!-- 添加此條件判斷 -->
+        <div class="small-img-col">
+          <img
+            src="{{ image.image.url }}"
+            width="100%"
+            class="small-img"
+            onclick="changeMainImage(this)"
+          />
+        </div>
+        {% endif %} {% endfor %}
+      </div>
+    </div>
+    
     <div class="col-2">
       <p>Home / {{ product.category.name }}</p>
       <h1>{{ product.name }}</h1>
@@ -41,10 +42,11 @@
         <div class="form-group">
           <label>Select category</label>
           <select name="variant" class="variant-select">
+            <option value=" {{ product.id }}" data-price="{{ product.price }}">
+              {{product.name}} - ${{product.price}}
+            </option>
             {% for variant in product.variants.all %}
-            <option value="{{ variant.id }}" 
-                    data-price="{{ variant.price }}"
-                    {% if variant.image %}data-image="{{ variant.image.url }}"{% endif %}>
+            <option value="{{ variant.id }}" data-price="{{ variant.price }}" {% if variant.image %} data-image="{{ variant.thumbnail.url }}" {% endif %}>
               {{ variant.name }} - ${{ variant.price }}
             </option>
             {% endfor %}
@@ -53,98 +55,101 @@
 
         <div class="form-group">
           <label>quantity：</label>
-          <input type="number" 
-                 name="quantity" 
-                 value="1" 
-                 min="1" 
-                 class="quantity-input"
-                 required
-                 style="width: 80px; padding: 8px;">
+          <input
+            type="number"
+            name="quantity"
+            value="1"
+            min="1"
+            class="quantity-input"
+            required
+            style="width: 80px; padding: 8px"
+          />
         </div>
 
         <button type="submit" class="btn">Add to Cart</button>
       </form>
-
-
     </div>
   </div>
 </div>
 {% if product.description %}
 <div class="product-description-container">
-  <div class="row aligned-row">  <!-- 新增对齐用class -->
+  <div class="row aligned-row">
+    <!-- 新增对齐用class -->
     <div class="col-2 full-width">
       <div class="description-card">
         <h3 class="description-title">Product Details</h3>
         <div class="description-content">
           <!-- 新增圖片包裹容器 -->
-          <div class="rich-content-wrapper">
-            {{ product.description|safe }}
-          </div>
+          <div class="rich-content-wrapper">{{ product.description|safe }}</div>
         </div>
       </div>
 
-
-<!-- 修改推荐商品部分 -->
-<div class="recommended-section">
-  <h2>Related recommended products</h2>
-  <div class="row">
-    {% for p in category_products %}
-    <div class="col-4">
-      <a href="{% url 'product_detail' p.slug %}">
-        
-          {% if p.thumbnail %}
-            <img src="{{ p.thumbnail.url }}" 
-                 alt="{{ p.name }}"
-                 class="product-thumbnail" style="width: 250px; height: 250px; object-fit: cover; display: block; margin: 0 auto;">  <!-- 移除内联样式 -->
-          {% else %}
-            <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                 alt="No Image"
-                 class="product-thumbnail" style="width: 350px; height: 350px; object-fit: cover; display: block; margin: 0 auto;">  <!-- 移除内联样式 -->
-          {% endif %}
-        
-      </a>
-      <div class="product-info">
-        <h4 style="text-align: center;">{{ p.name|truncatechars:20 }}</h4>
-        <p class="price">${{ p.price }}</p>
+      <!-- 修改推荐商品部分 -->
+      <div class="recommended-section">
+        <h2>Related recommended products</h2>
+        <div class="row">
+          {% for p in category_products %}
+          <div class="col-4">
+            <a href="{% url 'product_detail' p.slug %}">
+              {% if p.thumbnail %}
+              <img
+                src="{{ p.thumbnail.url }}"
+                alt="{{ p.name }}"
+                class="product-thumbnail"
+                style="
+                  width: 250px;
+                  height: 250px;
+                  object-fit: cover;
+                  display: block;
+                  margin: 0 auto;
+                "
+              />
+              <!-- 移除内联样式 -->
+              {% else %}
+              <img
+                src="{% static 'img/default-thumbnail.jpg' %}"
+                alt="No Image"
+                class="product-thumbnail"
+                style="
+                  width: 350px;
+                  height: 350px;
+                  object-fit: cover;
+                  display: block;
+                  margin: 0 auto;
+                "
+              />
+              <!-- 移除内联样式 -->
+              {% endif %}
+            </a>
+            <div class="product-info">
+              <h4 style="text-align: center">{{ p.name|truncatechars:20 }}</h4>
+              <p class="price">${{ p.price }}</p>
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <p>No recommended products found.</p>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
-    {% empty %}
-    <div class="col-12">
-      <p>No recommended products found.</p>
-    </div>
-    {% endfor %}
   </div>
 </div>
 
-
-
-
-
-
-
-
-    </div>
-  </div>
-</div>
-
-
-{% endif %}
-{% endblock %}
-
-{% block extra_scripts %}
+{% endif %} {% endblock %} {% block extra_scripts %}
 
 <style>
-
   .recommended-section .col-4 {
-    padding: 10px;  /* 保持与列表页一致 */
-    margin-bottom: 30px;  /* 增加底部间距 */
+    padding: 10px; /* 保持与列表页一致 */
+    margin-bottom: 30px; /* 增加底部间距 */
   }
 
   .product-thumbnail {
     width: 100%;
-    height: 350px;  
+    height: 350px;
     weight: 350px;
-    object-fit: cover;  
+    object-fit: cover;
     border-radius: 4px;
     transition: transform 0.3s ease;
   }
@@ -155,13 +160,13 @@
 
   @media (max-width: 600px) {
     .recommended-section .col-4 {
-      flex-basis: 50% !important; 
-      padding: 8px;  
+      flex-basis: 50% !important;
+      padding: 8px;
     }
 
     .product-thumbnail {
       width: 100%;
-      height: 170px;  
+      height: 170px;
     }
 
     .product-info h4 {
@@ -176,27 +181,23 @@
 
   @media (max-width: 400px) {
     .recommended-section .col-4 {
-      flex-basis: 100% !important;  /* 超小屏幕单列显示 */
+      flex-basis: 100% !important; /* 超小屏幕单列显示 */
     }
   }
-
-
-
-
 
   .recommended-section {
     margin-top: 50px;
     padding: 25px 0;
     border-top: 1px solid #eee;
   }
-  
+
   .recommended-section h2 {
     font-size: 24px;
     color: #333;
     margin-bottom: 30px;
     text-align: center;
   }
-  
+
   .recommended-wrapper {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -204,36 +205,36 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .recommended-item {
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
   }
-  
+
   .recommended-item:hover {
     transform: translateY(-5px);
   }
-  
+
   .recommended-thumbnail {
     width: 100%;
     height: 200px;
     object-fit: cover;
     border-bottom: 1px solid #eee;
   }
-  
+
   .recommended-info {
     padding: 15px;
   }
-  
+
   .recommended-info h4 {
     font-size: 16px;
     color: #333;
     margin-bottom: 8px;
   }
-  
+
   .price {
     font-size: 18px;
     color: #d31820;
@@ -242,7 +243,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .sale-badge {
     background: #d31820;
     color: white;
@@ -250,168 +251,165 @@
     border-radius: 4px;
     font-size: 12px;
   }
-  
+
   @media (max-width: 768px) {
     .recommended-wrapper {
       grid-template-columns: repeat(2, 1fr);
       gap: 15px;
     }
-    
+
     .recommended-thumbnail {
       height: 150px;
     }
   }
 
-
-  
-
-
-
-/* 产品描述优化样式 */
-.product-description-container {
-  margin: 50px 0;
-  padding: 0 25px;
-}
-
-.full-width {
-  flex-basis: 100% !important;
-  max-width: 1080px;
-  margin: 0 auto;
-}
-
-.description-card {
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 30px;
-  box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-  border: 1px solid #eee;
-}
-
-.description-title {
-  color: #223a77;
-  font-size: 24px;
-  margin-bottom: 25px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #d31820;
-}
-
-.description-content {
-  line-height: 1.7;
-  color: #555;
-}
-
-.description-content p {
-  margin-bottom: 15px;
-}
-
-.description-content ul,
-.description-content ol {
-  margin: 15px 0;
-  padding-left: 30px;
-}
-
-.description-content li {
-  margin-bottom: 8px;
-}
-
-.description-content img {
-  max-width: 100%;
-  height: auto;
-  margin: 20px 0;
-  border-radius: 4px;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .description-card {
-    padding: 20px;
-  }
-  
-  .description-title {
-    font-size: 20px;
-  }
-  
+  /* 产品描述优化样式 */
   .product-description-container {
-    margin: 30px 0;
-    padding: 0 15px;
+    margin: 50px 0;
+    padding: 0 25px;
   }
-}
 
-@media (max-width: 480px) {
-  .description-content {
-    font-size: 14px;
+  .full-width {
+    flex-basis: 100% !important;
+    max-width: 1080px;
+    margin: 0 auto;
   }
-  
+
+  .description-card {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+  }
+
+  .description-title {
+    color: #223a77;
+    font-size: 24px;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #d31820;
+  }
+
+  .description-content {
+    line-height: 1.7;
+    color: #555;
+  }
+
+  .description-content p {
+    margin-bottom: 15px;
+  }
+
   .description-content ul,
   .description-content ol {
-    padding-left: 20px;
-  }
-}
-
-/* 富文本圖片專用樣式 */
-.rich-content-wrapper {
-  display: grid;
-  gap: 25px;
-}
-
-.rich-content-wrapper img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin: 20px 0;
-  transition: transform 0.3s ease;
-  background: #fff;
-  padding: 5px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-}
-
-/* 圖片並排佈局 */
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  margin: 25px 0;
-}
-
-/* 響應式調整 */
-@media (max-width: 768px) {
-  .rich-content-wrapper img {
     margin: 15px 0;
-    border-radius: 6px;
+    padding-left: 30px;
   }
 
-  /* 移動端圖片縮放保護 */
+  .description-content li {
+    margin-bottom: 8px;
+  }
+
+  .description-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+    border-radius: 4px;
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    .description-card {
+      padding: 20px;
+    }
+
+    .description-title {
+      font-size: 20px;
+    }
+
+    .product-description-container {
+      margin: 30px 0;
+      padding: 0 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .description-content {
+      font-size: 14px;
+    }
+
+    .description-content ul,
+    .description-content ol {
+      padding-left: 20px;
+    }
+  }
+
+  /* 富文本圖片專用樣式 */
   .rich-content-wrapper {
-    overflow: hidden;
+    display: grid;
+    gap: 25px;
   }
-  
+
   .rich-content-wrapper img {
-    max-width: 100vw;
-    width: calc(100% + 40px);
-    margin-left: -20px;
-    border-radius: 0;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 20px 0;
+    transition: transform 0.3s ease;
+    background: #fff;
+    padding: 5px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   }
-}
 
+  /* 圖片並排佈局 */
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+  }
 
+  /* 響應式調整 */
+  @media (max-width: 768px) {
+    .rich-content-wrapper img {
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+
+    /* 移動端圖片縮放保護 */
+    .rich-content-wrapper {
+      overflow: hidden;
+    }
+
+    .rich-content-wrapper img {
+      max-width: 100vw;
+      width: calc(100% + 40px);
+      margin-left: -20px;
+      border-radius: 0;
+    }
+  }
 </style>
 
 <script>
   // 款式选择互动功能
-  document.querySelector('.variant-select').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    
-    // 更新價格
-    document.querySelector('h4').textContent = '$' + selectedOption.dataset.price;
-    
-    // 更新主圖像
-    if(selectedOption.dataset.image) {
-      document.getElementById('product-img').src = selectedOption.dataset.image;
-    }
-  });
+  document
+    .querySelector(".variant-select")
+    .addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+
+      // 更新價格
+      document.querySelector("h4").textContent =
+        "$" + selectedOption.dataset.price;
+
+      // 更新主圖像
+      if (selectedOption.dataset.image) {
+        document.getElementById("product-img").src =
+          selectedOption.dataset.image;
+      }
+    });
 
   const changeMainImage = (element) => {
-    document.getElementById('product-img').src = element.src;
+    document.getElementById("product-img").src = element.src;
   };
 </script>
 {% endblock %}

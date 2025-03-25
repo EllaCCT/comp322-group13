@@ -14,15 +14,17 @@ class Category(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-        super(Category, self).save(*args, **kwargs)    
+        super(Category, self).save(*args, **kwargs)
 
 class Product(models.Model):
     vendor = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE,
                                related_name='products',
                                null=True,
-                               blank=True)
+                               blank=True,
+                               limit_choices_to={"is_staff": True})
     #id=models.AutoField(primary_key=True,unique=True)
+    parent = models.ForeignKey("self", related_name='variants',on_delete=models.CASCADE, null=True, blank=True,limit_choices_to={"parent":None})
     category = models.ForeignKey(Category, related_name='products',on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100)
@@ -33,6 +35,8 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_show = models.BooleanField(verbose_name="show/hide product",default=True)
     stock = models.PositiveIntegerField(null=False,blank=False)
+    #color = models.ManyToManyField(Color)
+    #size = models.ManyToManyField(Size)
     tag = TaggableManager()
 
     def instock(self):
