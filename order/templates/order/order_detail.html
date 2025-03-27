@@ -22,9 +22,27 @@
         <!-- 保持原有元数据部分结构不变 -->
         <div class="order-meta">
             <div class="meta-group">
-                <div class="meta-item">
+                <class="meta-item">
                     <span class="meta-label">Order Date:</span>
-                    {{ order.date_added|date:"M d, Y H:i" }}
+                    {{ order.date_added|date:"M d, Y H:i" }}  
+                    <br/>                  
+                    {% if order.status == 'Shipped' %}
+                    <span class="meta-label">Shippment Date: </span>
+                    {{ order.shipment_date|date:"F j, Y, g:i a" }}
+                    {% endif %}
+                    <br/>
+                    {% if order.status == 'Cancelled' %}
+                    <span class="meta-label">Cancellation Date: </span>
+                    {{ order.cancellation_date|date:"F j, Y, g:i a" }}
+                    {% endif %}
+                    <br/>
+                    {% if order.status == 'Refunded' %}
+                    <span class="meta-label">Cancellation Date: </span>
+                    {{ order.cancellation_date|date:"F j, Y, g:i a" }}
+                    <br/>
+                    <span class="meta-label">Refund Date:</span>
+                    {{ order.refund_date|date:"F j, Y, g:i a" }}
+                    {% endif %}                    
                 </div>
                 {% if order.shipping_address %}
                 <div class="meta-item">
@@ -47,8 +65,8 @@
             {% for item in order.items.all %}
             <div class="order-item">
                 <div class="item-product">
-                    {% if item.product.images.first.thumbnail %}
-                    <img src="{{ item.product.images.first.thumbnail.url }}" 
+                    {% if item.product.thumbnail %}
+                    <img src="{{ item.product.thumbnail.url }}" 
                          alt="{{ item.product.name }}"
                          class="product-thumb">
                     {% endif %}

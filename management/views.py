@@ -26,7 +26,7 @@ OrderItemFormSet = inlineformset_factory(Order,OrderItem,
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ('category','name','price','description','is_show','stock', 'thumbnail','tag') # 依需調整字段
+        fields = ('category','parent','name','price','description','is_show','stock', 'thumbnail','tag') # 依需調整字段
         widgets = {
             'description': CKEditor5Widget(
                 attrs={"class": "django_ckeditor_5"}, 

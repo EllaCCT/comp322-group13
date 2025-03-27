@@ -1,12 +1,12 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
 from products.models import Product
 
 from order.models import Order, OrderItem
 from products.models import Product
 from users.models import Member
 from .cart import Cart
+from django.contrib import messages
 
 @login_required(login_url='/login/')
 def cart(request):
@@ -34,7 +34,7 @@ def update_cart(request, product_id):
 def remove_from_cart(request, product_id):
     cart = Cart(request)
     cart.remove(product_id)
-    return redirect( 'cart')
+    return redirect('cart')
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
@@ -42,8 +42,13 @@ def add_to_cart(request, product_id):
     selected_product_id = request.POST.get('product_id', product_id)
     product = get_object_or_404(Product, id=selected_product_id)
     quantity = int(request.POST.get('quantity', 1)) 
-    cart.add(product, quantity=quantity)
-    return redirect('cart')
+    if(quantity > product.stock): #檢查商品數量，若購買數量過多則回傳Error Message
+        messages.error(request,"Not enough stock!")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    else:
+        cart.add(product, quantity=quantity)
+        return redirect('cart')
+
 @login_required
 def checkout(request):
     cart = Cart(request)
@@ -55,21 +60,33 @@ def checkout(request):
         if not cart.items:
             return redirect('cart')
         
+        #檢查商品數量
+        for item in cart.items:
+            products = Product.objects.get(id=item['product'].id)
+            quantity = item['quantity']
+            if (quantity > products.stock):                
+                return redirect('cart')
+        
        # 创建订单（不再关联 product）
         order = Order.objects.create(
             user=request.user,
             shipping_address=request.POST.get('shipping_address', '')
         )
-        
+
         # 通过 OrderItem 关联商品
         for item in cart.items:
-            OrderItem.objects.create(
+            products = Product.objects.get(id=item['product'].id)
+            quantity = item['quantity']
+            if(products.stock > quantity):
+                OrderItem.objects.create(
                 order=order,
                 product=item['product'],
                 price=item['price'],
-                quantity=item['quantity']
-            )
-        
+                quantity=quantity
+                )
+                products.stock -=quantity
+                products.save()
+
         cart.clear()
         return redirect('order_detail', order_id=order.id)
     

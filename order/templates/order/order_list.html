@@ -32,8 +32,8 @@
                     {% for item in order.items.all %}
                     <div class="product-item">
                         <div class="product-image">
-                            {% if item.product.images.first.thumbnail %}
-                                <img src="{{ item.product.images.first.thumbnail.url }}" 
+                            {% if item.product.thumbnail %}
+                                <img src="{{ item.product.thumbnail.url }}" 
                                      alt="{{ item.product.name }}"
                                      class="product-thumb">
                             {% else %}

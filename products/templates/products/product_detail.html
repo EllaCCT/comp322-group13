@@ -7,8 +7,8 @@ product.name }}{% endblock %} {% block content %}
     <div class="col-2">
       <!-- 修改主圖片部分 -->
       <img
-        src="{% if product.images.first.image %}
-                {{ product.images.first.image.url }}
+        src="{% if product.thumbnail %}
+                {{ product.thumbnail.url }}
                 {% else %}
                 {% static 'img/default.jpg' %}
                 {% endif %}"
@@ -45,13 +45,15 @@ product.name }}{% endblock %} {% block content %}
           <select name="product_id" class="variant-select">
             <option value="{{ product.id }}" 
                     data-price="{{ product.price }}"
-                    data-image="{% if product.thumbnail %}{{ product.thumbnail.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}">
+                    data-image="{% if product.thumbnail %}{{ product.thumbnail.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}"
+                    data-stock="{{ product.stock }}">
               {{product.name}} - ${{product.price}}
             </option>
             {% for variant in product.variants.all %}
             <option value="{{ variant.id }}" 
                     data-price="{{ variant.price }}" 
-                    data-image="{% if variant.thumbnail %}{{ variant.thumbnail.url }}{% elif variant.images.first %}{{ variant.images.first.image.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}">
+                    data-image="{% if variant.thumbnail %}{{ variant.thumbnail.url }}{% elif variant.images.first %}{{ variant.images.first.image.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}"
+                    data-stock="{{ variant.stock }}">                    
               {{ variant.name }} - ${{ variant.price }}
             </option>
             {% endfor %}
@@ -70,7 +72,17 @@ product.name }}{% endblock %} {% block content %}
             style="width: 80px; padding: 8px"
           />
         </div>
-      
+        <div class="form-group" id="Instock" >
+          Stock : {{ product.stock }}
+        </div>
+        {% if messages %}
+        <div>
+        {% for message in messages %}          
+            {{ message }}          
+        {% endfor %}
+        </div>
+        {% endif %}
+
         <button type="submit" class="btn">Add to Cart</button>
       </form>
     </div>
@@ -411,10 +423,14 @@ product.name }}{% endblock %} {% block content %}
   document.addEventListener('DOMContentLoaded', function() {
     const variantSelect = document.querySelector('.variant-select');
     const mainImage = document.getElementById('product-img');
+    const Instock = document.getElementById('Instock');
 
     variantSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         const newImage = selectedOption.getAttribute('data-image');
+        const NewStock = selectedOption.getAttribute('data-stock')
+
+
         
         // 添加淡出效果
         mainImage.style.opacity = 0;
@@ -438,12 +454,17 @@ product.name }}{% endblock %} {% block content %}
       // 更新價格
       document.querySelector("h4").textContent =
         "$" + selectedOption.dataset.price;
+      
+      document.getElementById("Instock").textContent =
+        "Stock : " + selectedOption.dataset.stock;
 
       // 更新主圖像
       if (selectedOption.dataset.image) {
         document.getElementById("product-img").src =
           selectedOption.dataset.image;
       }
+
+
     });
 
   const changeMainImage = (element) => {
