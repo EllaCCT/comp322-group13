@@ -7,6 +7,10 @@
 {% csrf_token %}
 <h1>Product management</h1>
 
+<div class="stats">
+    Total Products: <span id="totalCount">{{ object_list|length }}</span>
+</div>
+
     <div class="search-box">
         <form action="." method="GET">
             <input type="text" 
@@ -61,4 +65,19 @@
     </tr>
     {% endfor %}
 </table>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 状态计数器
+        const counters = {
+            all: {{ object_list|length }},
+            onsale: document.querySelectorAll('tr[data-status="onsale"]').length,
+            hidden: document.querySelectorAll('tr[data-status="hidden"]').length
+        };
+
+
+</style>
 {% endblock %}
+
+
