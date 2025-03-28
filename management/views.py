@@ -50,8 +50,7 @@ class ProductListView(SuperUserRequiredMixin,ListView):
         if query:
             try:
                 # 嘗試將 query 轉換為數字來搜索 ID
-                product_id = int(query)
-                queryset = queryset.filter(id=product_id)
+                queryset = queryset.filter(id__contains=query)
             except ValueError:
                 # 若轉換失敗，則模糊搜索名稱
                 queryset = queryset.filter(name__icontains=query)

@@ -32,7 +32,10 @@ def product_list(request):
     query=request.GET.get('query','')
     
     if query: ##搜尋可以透過搜尋商品名稱或描述
-        products = products.filter(Q(name__icontains=query)|Q(description__icontains=query)|Q(price__icontains=query)|Q(tag__icontains=query)) 
+        products = products.filter(Q(name__icontains=query)|
+                                   Q(description__icontains=query)|
+                                   Q(price__icontains=query)|
+                                   Q(tag__name__icontains=query)) 
     ###
 
     content = {
