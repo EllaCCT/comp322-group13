@@ -17,6 +17,7 @@ class Category(models.Model):
         super(Category, self).save(*args, **kwargs)
 
 class Product(models.Model):
+    BOOL_CHOICES = ((True, 'Show'), (False, 'Hide'))
     vendor = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE,
                                related_name='products',
@@ -33,11 +34,12 @@ class Product(models.Model):
     #image = models.ForeignKey.ImageField(upload_to='product', blank=True, null=True)
     thumbnail = models.ImageField(upload_to='products/thumbnails', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_show = models.BooleanField(verbose_name="show/hide product",default=True)
+    is_show = models.BooleanField(verbose_name='Show/hide product',choices=BOOL_CHOICES,default=True)
     stock = models.PositiveIntegerField(null=False,blank=False)
     #color = models.ManyToManyField(Color)
     #size = models.ManyToManyField(Size)
     tag = TaggableManager()
+    
 
     def instock(self):
         return self.stock
@@ -48,6 +50,33 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Product, self).save(*args, **kwargs)
+
+class Color(models.Model):
+    color = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.color
+    
+class Size(models.Model):
+    size = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.size
+
+class ProductAttributes(models.Model):
+    product = models.ForeignKey(Product, related_name='product_attr',on_delete=models.CASCADE)
+    sizes = models.ForeignKey(Size,on_delete=models.CASCADE)
+    colors = models.ForeignKey(Color,on_delete=models.CASCADE)
+    prices = models.DecimalField(max_digits=5,decimal_places=2)
+    order = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Product Attribute'
+        verbose_name_plural = 'Product Attribute'
+        ordering = ['order']
+        
+    def __str__(self):
+        return self.product.name
 
     
 class ProductImage(models.Model):

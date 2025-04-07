@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import Category,Product,ProductImage
+from .models import *
 from django.utils.safestring import mark_safe
-
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -14,17 +13,23 @@ class ProductImageInline(admin.TabularInline):
         return "-"
     image_preview.short_description = 'Preview'
 
-class ProductAdmin(admin.ModelAdmin):
-    #list_display = ('id', 'name', 'category', 'price', 'is_show', 'is_sale')
-    search_fields = ['id', 'name', 'category__name']
-    inlines = [ProductImageInline,]
+class ProductAttributesInline(admin.StackedInline):
+    model = ProductAttributes
+    extra = 3  
 
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'category', 'is_show')
+    search_fields = ['id', 'name', 'category__name']
+    inlines = [
+        ProductAttributesInline,
+        ProductImageInline
+        ]
     readonly_fields = ['id']
 
 class CategoryAdmin(admin.ModelAdmin):
     readonly_fields = ['slug']
 
 admin.site.register(Category, CategoryAdmin)
-#admin.site.register(Product,ProductAdmin)
+admin.site.register(Product,ProductAdmin)
 #admin.site.register(ProductImage)
 

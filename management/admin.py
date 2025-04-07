@@ -25,7 +25,4 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'status', 'date_added')
     #inlines = [OrderItemInline] 
 
-    
-
-admin.site.register(Product, ProductAdmin)
 admin.site.register(Order)

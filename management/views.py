@@ -31,7 +31,8 @@ class ProductForm(forms.ModelForm):
             'description': CKEditor5Widget(
                 attrs={"class": "django_ckeditor_5"}, 
                 config_name="default"  # 對應 settings.py 中的 CKEDITOR_5_CONFIGS
-            )
+            ),
+            'is_show' : forms.RadioSelect
         }
 
 class SuperUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
