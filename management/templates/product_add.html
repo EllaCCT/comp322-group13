@@ -7,8 +7,17 @@
 <form method ="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    {{ form.media }} 
+    {{ form.media }}
     
+    <h3>Product Attributes</h3>
+    {{ attribute_formset.management_form }}
+    {% for form in attribute_formset %}
+    <div>
+        <p>Color:{{ form.colors }}</p>
+        <p>Size:{{ form.sizes }}</p>
+    </div>
+    {% endfor %}
+
 
     <h3>Product Images</h3>
     {{ image_formset.management_form }}

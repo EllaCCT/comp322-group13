@@ -39,7 +39,7 @@ class Product(models.Model):
     #color = models.ManyToManyField(Color)
     #size = models.ManyToManyField(Size)
     tag = TaggableManager()
-    
+    #has_attribute = models.BooleanField()
 
     def instock(self):
         return self.stock
@@ -67,7 +67,7 @@ class ProductAttributes(models.Model):
     product = models.ForeignKey(Product, related_name='product_attr',on_delete=models.CASCADE)
     sizes = models.ForeignKey(Size,on_delete=models.CASCADE)
     colors = models.ForeignKey(Color,on_delete=models.CASCADE)
-    prices = models.DecimalField(max_digits=5,decimal_places=2)
+    #prices = models.DecimalField(max_digits=5,decimal_places=2)
     order = models.DateTimeField(auto_now_add=True)
     
     class Meta:

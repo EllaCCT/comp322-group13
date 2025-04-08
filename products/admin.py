@@ -31,5 +31,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product,ProductAdmin)
+admin.site.register(Color)
+admin.site.register(Size)
 #admin.site.register(ProductImage)
 

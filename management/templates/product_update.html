@@ -15,6 +15,15 @@
             {{ form.is_show }}
             {{ form.is_sale }}
     </div>-->
+    <h3>Product Attributes</h3>
+    {{ attribute_formset.management_form }}
+    {% for form in attribute_formset %}
+    <div>
+        <p>Color:{{ form.colors }}</p>
+        <p>Size:{{ form.sizes }}</p>        
+    </div>
+    {% endfor %}
+
 
     <h3>Product Images</h3>
     {{ image_formset.management_form }}

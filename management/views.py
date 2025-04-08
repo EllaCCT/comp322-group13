@@ -1,5 +1,5 @@
 from django.views.generic import ListView , UpdateView, CreateView, DeleteView
-from products.models import Product,ProductImage
+from products.models import *
 from order.models import Order,OrderItem
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -23,6 +23,13 @@ OrderItemFormSet = inlineformset_factory(Order,OrderItem,
                                         extra=0  # 不顯示空白欄位
                                         )
 
+ProductAttributeFormSet = inlineformset_factory(
+    Product, ProductAttributes,
+    fields=('colors','sizes',),
+    extra = 4,
+    can_delete=True
+)
+
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -32,7 +39,7 @@ class ProductForm(forms.ModelForm):
                 attrs={"class": "django_ckeditor_5"}, 
                 config_name="default"  # 對應 settings.py 中的 CKEDITOR_5_CONFIGS
             ),
-            'is_show' : forms.RadioSelect
+            'is_show' : forms.RadioSelect,
         }
 
 class SuperUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -77,8 +84,10 @@ class ProductUpdateView(SuperUserRequiredMixin,UpdateView):
             context['image_formset'] = ProductImageFormSet(
                 self.request.POST, self.request.FILES, instance=self.object
             )
+            context['attribute_formset'] = ProductAttributeFormSet(self.request.POST,instance=self.object)
         else:
             context['image_formset'] = ProductImageFormSet(instance=self.object)
+            context['attribute_formset'] = ProductAttributeFormSet(instance=self.object)
         return context
     
 class AddProductView(SuperUserRequiredMixin,CreateView):
@@ -96,32 +105,41 @@ class AddProductView(SuperUserRequiredMixin,CreateView):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context['image_formset'] = ProductImageFormSet(self.request.POST, self.request.FILES)
+            context['attribute_formset'] = ProductAttributeFormSet(self.request.POST)
         else:
             context['image_formset'] = ProductImageFormSet()
+            context['attribute_formset'] = ProductAttributeFormSet()
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
         image_formset = context['image_formset']
+        attribute_formset = context['attribute_formset']
 
         self.object = form.save(commit=False)
         self.object.vendor = self.request.user
         self.object.save()
+
+        attribute_formset = ProductAttributeFormSet(
+            self.request.POST,
+            instance=self.object
+        )
 
         image_formset = ProductImageFormSet(
             self.request.POST,
             self.request.FILES,
             instance=self.object
         )
-        if image_formset.is_valid():
+        if image_formset.is_valid() and attribute_formset.is_valid():
             image_formset.save()
+            attribute_formset.save()
         else:
             return self.form_invalid(form)
         return super().form_valid(form)
     
     def form_invalid(self, form):
         return self.render_to_response(
-            self.get_context_data(form=form, image_formset=self.get_context_data()['image_formset'])
+            self.get_context_data(form=form, image_formset=self.get_context_data()['image_formset'], attribute_formset=self.get_context_data()['attribute_formset'])
         )
 
 class ProductDeleteView(SuperUserRequiredMixin,DeleteView):
