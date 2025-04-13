@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="cart-container">
+{% if cart.items %}
+
+
+<div class="cart-action-bar">
+  <a href="{% url 'product' %}" class="back-link">
+      ← Back to Products
+  </a>
+</div>
+
+
+
+  <div class="cart-header-row">
+    <div class="header-product">Product</div>
+    <div class="header-quantity" style="    padding-left: 70px;">Quantity</div>
+    <div class="header-subtotal"style="   wf padding-right: 40px;">Price</div>
+    <div class="header-action">  </div>
+  </div>
+
+  <div class="cart-items">
+    {% for item in cart.items %}
+    <div class="cart-item">
+      <div class="item-info">
+        <a href="{% if item.product.parent %}{% url 'product_detail' item.product.parent.slug %}{% else %}{% url 'product_detail' item.product.slug %}{% endif %}" class="product-link">
+          {% if item.product.thumbnail %}
+            <img class="item-thumbnail" 
+                 src="{{ item.product.thumbnail.url }}" 
+                 alt="{{ item.product.name }}">
+          {% else %}
+            <div class="thumbnail-placeholder">No Image</div>
+          {% endif %}
+        </a>
+        <div class="item-details">
+          <a href="{% if item.product.parent %}{% url 'product_detail' item.product.parent.slug %}{% else %}{% url 'product_detail' item.product.slug %}{% endif %}" class="product-link">
+            <h3>{{ item.product.name }}</h3>
+          </a>
+          <p class="item-price">
+            ${{ item.product.price|floatformat:2 }}
+          </p>
+          {% if item.color %}
+            <p class="item-attribute">Color: {{ item.color }}</p>
+          {% endif %}
+          {% if item.size %}
+            <p class="item-attribute">Size: {{ item.size }}</p>
+          {% endif %}
+        </div>
+        
+      </div>
+
+      <div class="quantity-control">
+        <form action="{% url 'update_cart' item.product.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="decrease">
+            {% if item.color %}<input type="hidden" name="color" value="{{ item.color }}">{% endif %}
+            {% if item.size %}<input type="hidden" name="size" value="{{ item.size }}">{% endif %}
+            <button type="submit" class="qty-btn">−</button>
+        </form>
+        <span class="current-qty">{{ item.quantity }}</span>
+        <form action="{% url 'update_cart' item.product.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="increase">
+            {% if item.color %}<input type="hidden" name="color" value="{{ item.color }}">{% endif %}
+            {% if item.size %}<input type="hidden" name="size" value="{{ item.size }}">{% endif %}
+            <button type="submit" class="qty-btn" {% if item.product.stock <= item.quantity %}disabled{% endif %}>+</button>
+        </form>
+    </div>
+
+      <div class="item-subtotal">
+        ${{ item.total_price|floatformat:2 }}
+      </div>
+
+      <form class="remove-form" action="{% url 'remove_from_cart' item.product.id %}" method="post">
+        {% csrf_token %}
+        {% if item.color %}<input type="hidden" name="color" value="{{ item.color }}">{% endif %}
+        {% if item.size %}<input type="hidden" name="size" value="{{ item.size }}">{% endif %}
+        <button type="submit" class="remove-btn">
+            <img src="{% static 'img/remove.svg' %}" alt="Remove item">
+        </button>
+    </form>
+    </div>
+  {% endfor %}
+  </div>
+
+  <div class="cart-summary">
+    <div class="total-price">
+      <span>Total:</span>
+      <span>${{ cart.total_price|floatformat:2 }}</span>
+    </div>
+    <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout</a>
+  </div>
+
+{% else %}
+  <div class="empty-cart">
+    <h3>Your cart is feeling a little lonely<br>time to fill it up with some love!</h3>
+  </div>
+{% endif %}
+</div>
+
+<style>
+
+
+  .cart-action-bar {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    padding: 0 1.5rem;
+}
+
+.back-link {
+    color: #223a77;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #223a77;
+    transition: all 0.2s;
+    font-size: var(--text-sm);
+}
+
+.back-link:hover {
+    background: #223a77;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .cart-action-bar {
+        padding: 0 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .back-link {
+        padding: 0.4rem 0.8rem;
+        font-size: var(--text-xs);
+    }
+}
+
+
+
+  .cart-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  
+  .cart-header-row {
+    display: flex;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #666;
+    font-size: var(--text-sm);
+  }
+  
+  .header-product { flex: 2; }
+  .header-quantity { flex: 1; text-align: center; }
+  .header-subtotal { flex: 0.5; text-align: right; padding-right: 60px; }
+  .header-action { width: 40px; }
+  
+  .cart-items {
+    margin-bottom: 40px;
+  }
+  
+  .cart-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+  }
+  
+  .item-info {
+    flex: 2;
+    display: flex;
+    align-items: center;
+  }
+  
+  .product-link {
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s;
+    display: block;
+  }
+  
+  .product-link:hover {
+    opacity: 0.8;
+    text-decoration: none;
+  }
+  
+  .item-thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-right: 20px;
+    transition: transform 0.2s;
+  }
+  
+  .product-link:hover .item-thumbnail {
+    transform: scale(1.05);
+  }
+  
+  .thumbnail-placeholder {
+    width: 100px;
+    height: 100px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    margin-right: 20px;
+    font-size: var(--text-sm);
+  }
+  
+  .item-details h3 {
+    font-size: var(--text-lg);
+    margin: 0 0 8px 0;
+  }
+  
+  .item-price {
+    font-size: var(--text-base);
+    color: #223a77;
+    margin: 0;
+  }
+  
+  .item-brand,
+  .item-description {
+    font-size: var(--text-sm);
+    color: #666;
+    margin: 4px 0 0 0;
+  }
+  
+  .quantity-control {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .qty-btn {
+    background: none;
+    border: 1px solid #223a77;
+    color: #223a77;
+    width: calc(var(--text-base) * 2);
+    height: calc(var(--text-base) * 2);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .qty-btn:hover {
+    background: #223a77;
+    color: white;
+  }
+  
+  .current-qty {
+    margin: 0 15px;
+    font-size: var(--text-base);
+  }
+  
+  .item-subtotal {
+    flex: 0.5;
+    text-align: right;
+    font-weight: bold;
+    color: #223a77;
+    font-size: var(--text-base);
+    margin-right: 60px;
+  }
+  
+  .remove-form {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    font-size: var(--text-base);
+  }
+  
+  .remove-btn img {
+    width: calc(var(--text-base) * 1.5);
+    height: calc(var(--text-base) * 1.5);
+    transition: transform 0.2s;
+    min-width: 24px; /* 保持最小可点击区域 */
+    min-height: 24px;
+  }
+  
+  .remove-btn:hover img {
+    transform: scale(1.1);
+  }
+  
+  .cart-summary {
+    margin-top: 40px;
+    border-top: 2px solid #223a77;
+    padding-top: 30px;
+    text-align: right;
+  }
+  
+  .total-price {
+    font-size: var(--text-xl);
+    margin-bottom: 30px;
+  }
+  
+  .checkout-btn {
+    background: #223a77;
+    color: white;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 4px;
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .checkout-btn:hover {
+    background: #db1f39;
+  }
+  
+  .empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: var(--text-xl);
+  }
+  
+  @media (max-width: 768px) {
+    .cart-header-row {
+      display: none;
+    }
+  
+    .cart-item {
+      flex-wrap: wrap;
+      padding: 15px;
+      gap: 10px;
+    }
+  
+    .item-info {
+      flex: 1 1 100%;
+      margin-bottom: 15px;
+    }
+  
+    .product-link {
+      display: flex;
+      align-items: center;
+    }
+  
+    .quantity-control {
+      flex: 1;
+      order: 2;
+      justify-content: flex-start;
+    }
+  
+    .item-subtotal {
+      flex: 1;
+      text-align: left;
+      order: 3;
+      padding-left: 20px;
+      margin-right: 0;
+      font-size: var(--text-lg);
+    }
+  
+    .remove-form {
+      top: 15px;
+      right: 15px;
+      transform: none;
+    }
+  
+    .item-thumbnail {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .qty-btn {
+      width: calc(var(--text-base) * 1.8);
+      height: calc(var(--text-base) * 1.8);
+      font-size: var(--text-sm);
+    }
+  
+    .current-qty {
+      margin: 0 10px;
+      font-size: var(--text-base);
+    }
+  
+    .item-details h3 {
+      font-size: var(--text-base);
+      padding-right: 30px;
+    }
+  
+    .total-price {
+      font-size: var(--text-lg);
+    }
+  
+    .remove-btn img {
+      width: calc(var(--text-base) * 1.3);
+      height: calc(var(--text-base) * 1.3);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .cart-container {
+      padding: 0 10px;
+    }
+  
+    .item-price {
+      font-size: var(--text-sm);
+    }
+  
+    .checkout-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: var(--text-base);
+    }
+  
+    .empty-cart {
+      font-size: var(--text-lg);
+      padding: 30px 10px;
+    }
+  
+    .remove-btn img {
+      width: calc(var(--text-base) * 1.2);
+      height: calc(var(--text-base) * 1.2);
+    }
+  }
+</style>
+
+{% endblock %}

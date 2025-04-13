@@ -1,0 +1,638 @@
+<!-- templates/users/product_detail.html -->
+
+{% extends "base.html" %} {% load static %} {% block title %}ISI STORE | {{
+  product.name }}{% endblock %} {% block content %}
+  <div class="small-container single-product">
+    <div class="row">
+      <div class="col-2">
+        <!-- 修改主圖片部分 -->
+        <img
+          src="{% if product.thumbnail %}
+                  {{ product.thumbnail.url }}
+                  {% else %}
+                  {% static 'img/default.jpg' %}
+                  {% endif %}"
+          width="100%"
+          id="product-img"
+        />
+  
+        <!-- 修改小圖循環部分 -->
+        <div class="small-img-row">
+          {% for image in product.images.all %} {% if image.image %}
+          <!-- 添加此條件判斷 -->
+          <div class="small-img-col">
+            <img
+              src="{{ image.image.url }}"
+              width="100%"
+              class="small-img"
+              onclick="changeMainImage(this)"
+            />
+          </div>
+          {% endif %} {% endfor %}
+        </div>
+      </div>
+      
+      <div class="col-2">
+        <p>Home / {{ product.category.name }}</p>
+        <h1>{{ product.name }}</h1>
+        <h4>${{ product.price }}</h4>
+  
+  
+        <form action="{% url 'add_to_cart' product.id %}" method="post" id="add-to-cart-form">
+          {% csrf_token %}
+
+          {% if available_sizes %}
+          <div class="form-group">
+            <label>Select Size</label>
+            <select name="size" class="attribute-select" required>
+              <option value="">Choose Size</option>
+              {% for size in available_sizes %}
+              <option value="{{ size.size }}">{{ size.size }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+
+          {% if available_colors %}
+          <div class="form-group">
+            <label>Select Color</label>
+            <select name="color" class="attribute-select" required>
+              <option value="">Choose Color</option>
+              {% for color in available_colors %}
+              <option value="{{ color.color }}">{{ color.color }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+          
+          <div class="form-group">
+            <label>Select variant</label>
+            <select name="product_id" 
+            class="variant-select"
+            title="{{ product.name }} - ${{ product.price }} {% for variant in product.variants.all %}{{ variant.name }} - ${{ variant.price }} {% endfor %}">            <option value="{{ product.id }}" 
+                      data-price="{{ product.price }}"
+                      data-image="{% if product.thumbnail %}{{ product.thumbnail.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}"
+                      data-stock="{{ product.stock }}">
+                {{product.name}} - ${{product.price}}
+              </option>
+              {% for variant in product.variants.all %}
+              <option value="{{ variant.id }}" 
+                      data-price="{{ variant.price }}" 
+                      data-image="{% if variant.thumbnail %}{{ variant.thumbnail.url }}{% elif variant.images.first %}{{ variant.images.first.image.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}"
+                      data-stock="{{ variant.stock }}">                    
+                {{ variant.name }} - ${{ variant.price }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        
+          <div class="form-group">
+            <label>quantity：</label>
+            <input
+              type="number"
+              name="quantity"
+              value="1"
+              min="1"
+              class="quantity-input"
+              required
+              style="width: 80px; padding: 8px"
+            />
+          </div>
+          <div class="form-group" id="Instock" >
+            Stock : {{ product.stock }}
+          </div>
+          {% if messages %}
+          <div>
+          {% for message in messages %}          
+              {{ message }}          
+          {% endfor %}
+          </div>
+          {% endif %}
+  
+          <button type="submit" class="btn">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% if product.description %}
+  <div class="product-description-container">
+    <div class="row aligned-row">
+      <!-- 新增对齐用class -->
+      <div class="col-2 full-width">
+        <div class="description-card">
+          <h3 class="description-title">Product Details</h3>
+          <div class="description-content">
+            <!-- 新增圖片包裹容器 -->
+            <div class="rich-content-wrapper">{{ product.description|safe }}</div>
+          </div>
+        </div>
+  
+        <!-- 修改推荐商品部分 -->
+        <div class="recommended-section">
+          <h2 style="font-size: var(--text-4xl);">Related recommended products</h2>
+          <div class="row">
+            {% for p in category_products %}
+            <div class="col-4">
+              <a href="{% url 'product_detail' p.slug %}">
+                {% if p.thumbnail %}
+                <img
+                  src="{{ p.thumbnail.url }}"
+                  alt="{{ p.name }}"
+                  class="product-thumbnail"
+                  style="
+                    width: 250px;
+                    height: 250px;
+                    object-fit: cover;
+                    display: block;
+                    margin: 0 auto;
+                  "
+                />
+                <!-- 移除内联样式 -->
+                {% else %}
+                <img
+                  src="{% static 'img/default-thumbnail.jpg' %}"
+                  alt="No Image"
+                  class="product-thumbnail"
+                  style="
+                    width: 350px;
+                    height: 350px;
+                    object-fit: cover;
+                    display: block;
+                    margin: 0 auto;
+                  "
+                />
+                <!-- 移除内联样式 -->
+                {% endif %}
+              </a>
+              <div class="product-info">
+                <h4 style="text-align: center">{{ p.name|truncatechars:20 }}</h4>
+                <p class="price">${{ p.price }}</p>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+              <p>No recommended products found.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {% endif %} {% endblock %} {% block extra_scripts %}
+  
+  <style>
+  
+  
+    /* 价格样式适配 */
+  h4.price {
+    font-size: var(--text-2xl) !important; /* 使用标题变量 */
+    color: #d31820;
+    margin: 15px 0;
+  }
+  
+  /* 选项框字体适配 */
+  .variant-select {
+    font-size: var(--text-base) !important;
+    max-width: 400px; /* 增加默认宽度 */
+  }
+  
+  
+  /* 相关推荐商品整体适配 */
+  .recommended-section h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: 1.2em;
+  }
+  
+  .recommended-section .product-info h4 {
+    font-size: var(--text-lg);
+    margin: 0.8em 0;
+  }
+  
+  .recommended-section .price {
+    font-size: var(--text-lg);
+  }
+  
+  /* 推荐商品图片容器 */
+  .recommended-section .col-4 {
+    padding: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  /* 表单元素统一适配 */
+  .form-group label {
+    font-size: var(--text-lg);
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .quantity-input {
+    font-size: var(--text-base) !important;
+    height: 2.8em !important;
+  }
+  
+  /* 产品描述区域适配 */
+  .description-title {
+    font-size: var(--text-2xl) !important;
+  }
+  
+  .description-content {
+    font-size: var(--text-base);
+    line-height: 1.8;
+  }
+  
+  /* 移动端优化 */
+  @media (max-width: 768px) {
+    .recommended-section h2 {
+      font-size: var(--text-2xl);
+    }
+    
+    .variant-select {
+      max-width: 100%;
+    }
+  }
+  
+  /* 修复内联样式问题 */
+  .product-thumbnail {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 350px;
+    object-fit: cover !important;
+  }
+  
+  
+  
+    /* 下拉菜单容器样式 */
+    .variant-select {
+      max-width: 300px; /* 设置最大宽度 */
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 25px; /* 给下拉箭头留空间 */
+    }
+    
+    /* 展开后的选项样式 */
+    .variant-select option {
+      white-space: normal; /* 允许换行 */
+      max-width: 400px;    /* 限制最大宽度 */
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+      .variant-select {
+        max-width: 100%;
+      }
+      
+      .variant-select option {
+        max-width: 90vw;
+      }
+    }
+    
+    /* 鼠标悬停显示完整文字提示 */
+    .variant-select {
+      position: relative;
+    }
+    
+    .variant-select:hover::after {
+      content: attr(title);
+      position: absolute;
+      left: 0;
+      top: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 8px;
+      z-index: 1000;
+      white-space: normal;
+      width: 300px;
+      display: none;
+    }
+    
+    .variant-select:hover {
+      overflow: visible;
+    }
+  
+  
+  
+    
+    .recommended-section .col-4 {
+      padding: 10px; /* 保持与列表页一致 */
+      margin-bottom: 30px; /* 增加底部间距 */
+    }
+  
+    .product-thumbnail {
+      width: 100%;
+      height: 350px;
+      weight: 350px;
+      object-fit: cover;
+      border-radius: 4px;
+      transition: transform 0.3s ease;
+    }
+  
+    .product-thumbnail:hover {
+      transform: scale(1.03);
+    }
+  
+    @media (max-width: 600px) {
+      .recommended-section .col-4 {
+        flex-basis: 50% !important;
+        padding: 8px;
+      }
+  
+      .product-thumbnail {
+        width: 100%;
+        height: 170px;
+      }
+  
+      .product-info h4 {
+        font-size: 14px;
+        justify-content: center;
+      }
+  
+      .price {
+        font-size: 14px;
+      }
+    }
+  
+    @media (max-width: 400px) {
+      .recommended-section .col-4 {
+        flex-basis: 100% !important; /* 超小屏幕单列显示 */
+      }
+    }
+  
+    .recommended-section {
+      margin-top: 50px;
+      padding: 25px 0;
+      border-top: 1px solid #eee;
+    }
+  
+    .recommended-section h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+  
+    .recommended-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  
+    .recommended-item {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+  
+    .recommended-item:hover {
+      transform: translateY(-5px);
+    }
+  
+    .recommended-thumbnail {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+  
+    .recommended-info {
+      padding: 15px;
+    }
+  
+    .recommended-info h4 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+  
+    .price {
+      font-size: 18px;
+      color: #d31820;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .sale-badge {
+      background: #d31820;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  
+    @media (max-width: 768px) {
+      .recommended-wrapper {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+  
+      .recommended-thumbnail {
+        height: 150px;
+      }
+    }
+  
+    /* 产品描述优化样式 */
+    .product-description-container {
+      margin: 50px 0;
+      padding: 0 25px;
+    }
+  
+    .full-width {
+      flex-basis: 100% !important;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+  
+    .description-card {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eee;
+    }
+  
+    .description-title {
+      color: #223a77;
+      font-size: 24px;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #d31820;
+    }
+  
+    .description-content {
+      line-height: 1.7;
+      color: #555;
+    }
+  
+    .description-content p {
+      margin-bottom: 15px;
+    }
+  
+    .description-content ul,
+    .description-content ol {
+      margin: 15px 0;
+      padding-left: 30px;
+    }
+  
+    .description-content li {
+      margin-bottom: 8px;
+    }
+  
+    .description-content img {
+      max-width: 100%;
+      height: auto;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+  
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .description-card {
+        padding: 20px;
+      }
+  
+      .description-title {
+        font-size: 20px;
+      }
+  
+      .product-description-container {
+        margin: 30px 0;
+        padding: 0 15px;
+      }
+    }
+  
+    @media (max-width: 480px) {
+      .description-content {
+        font-size: 14px;
+      }
+  
+      .description-content ul,
+      .description-content ol {
+        padding-left: 20px;
+      }
+    }
+  
+    /* 富文本圖片專用樣式 */
+    .rich-content-wrapper {
+      display: grid;
+      gap: 25px;
+    }
+  
+    .rich-content-wrapper img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 20px 0;
+      transition: transform 0.3s ease;
+      background: #fff;
+      padding: 5px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+  
+    /* 圖片並排佈局 */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 25px 0;
+    }
+  
+    /* 響應式調整 */
+    @media (max-width: 768px) {
+      .rich-content-wrapper img {
+        margin: 15px 0;
+        border-radius: 6px;
+      }
+  
+      /* 移動端圖片縮放保護 */
+      .rich-content-wrapper {
+        overflow: hidden;
+      }
+  
+      .rich-content-wrapper img {
+        max-width: 100vw;
+        width: calc(100% + 40px);
+        margin-left: -20px;
+        border-radius: 0;
+      }
+    }
+  
+  
+  
+  
+    #product-img {
+      transition: opacity 0.3s ease-in-out;
+  } 
+  </style>
+  
+  <script>
+  
+  
+  
+  
+  
+    document.addEventListener('DOMContentLoaded', function() {
+      const variantSelect = document.querySelector('.variant-select');
+      const mainImage = document.getElementById('product-img');
+      const Instock = document.getElementById('Instock');
+  
+      variantSelect.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          const newImage = selectedOption.getAttribute('data-image');
+          const NewStock = selectedOption.getAttribute('data-stock')
+  
+  
+          
+          // 添加淡出效果
+          mainImage.style.opacity = 0;
+          setTimeout(() => {
+              mainImage.src = newImage;
+              mainImage.style.opacity = 1;
+          }, 300); // 300毫秒后切换图片并恢复透明度
+      });
+  });
+  
+  
+  
+  
+  
+    // 款式选择互动功能
+    document
+      .querySelector(".variant-select")
+      .addEventListener("change", function () {
+        const selectedOption = this.options[this.selectedIndex];
+  
+        // 更新價格
+        document.querySelector("h4").textContent =
+          "$" + selectedOption.dataset.price;
+        
+        document.getElementById("Instock").textContent =
+          "Stock : " + selectedOption.dataset.stock;
+  
+        // 更新主圖像
+        if (selectedOption.dataset.image) {
+          document.getElementById("product-img").src =
+            selectedOption.dataset.image;
+        }
+  
+  
+      });
+  
+    const changeMainImage = (element) => {
+      document.getElementById("product-img").src = element.src;
+    };
+  </script>
+  {% endblock %}
+  

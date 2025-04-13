@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+
+<h1>Update</h1>
+<form method ="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.media }} 
+    {{ form.as_p }}
+    
+    <!--<div>
+        <label>Status:</label>
+            {{ form.is_show }}
+            {{ form.is_sale }}
+    </div>-->
+    <h3>Product Attributes</h3>
+    {{ attribute_formset.management_form }}
+    {% for form in attribute_formset %}
+    <div>
+        <p>Color:{{ form.colors }}</p>
+        <p>Size:{{ form.sizes }}</p>        
+    </div>
+    {% endfor %}
+
+
+    <h3>Product Images</h3>
+    {{ image_formset.management_form }}
+    {% for form in image_formset %}
+    <div>
+        {% if form.instance.image %}
+        <img src="{{ form.instance.image.url }}" style="max-height: 100px;">
+        {% endif %}
+        
+        <table>
+        {{ form.image.label_tag }}
+        {{ form.image }}
+        
+        <!-- 添加缩略图上传字段 -->
+        {{ form.thumbnail.label_tag }}
+        {{ form.thumbnail }}
+        
+        </table>
+    </div>
+    {% endfor %}
+    
+    <input type="submit" value="Save Product">
+</form>
+{% endblock %}

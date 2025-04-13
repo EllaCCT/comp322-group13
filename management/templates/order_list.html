@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vendor Order List{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="order-container">
+    <h1 class="order-header">Order Management</h1>
+    
+    <!-- 统计和筛选容器 -->
+    <div class="stats-filter-container">
+        <div class="total-orders">
+             Total Orders: <strong>{{ object_list|length }}</strong>
+        </div>
+
+        <!-- 状态筛选器 -->
+        <div class="status-filter" id="statusFilter">
+            <button class="filter-btn active" data-status="all">All</button>
+            <button class="filter-btn" data-status="pending">Pending</button>
+            <button class="filter-btn" data-status="ordered">Ordered</button>
+            <button class="filter-btn" data-status="shipped">Shipped</button>
+            <button class="filter-btn" data-status="cancelled">Cancelled</button>
+            <button class="filter-btn" data-status="refunded">Refunded</button>
+        </div>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-box">
+        <form action="." method="GET">
+            <input type="text" 
+                name="query" 
+                placeholder="Search by order ID or Name" 
+                value="{{ request.GET.query}}">
+            <button type="submit" style="display:none">Submit</button>
+        </form>
+    </div>
+
+    {% if request.GET.query %}
+    <a href="{% url 'vendor_order_list' %}" class="back-button">Back to All Orders</a>
+    {% endif %}
+
+    <!-- 订单表格 -->
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User Name</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Date Added</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in object_list %}
+            <tr data-status="{{ order.status|lower }}">
+                <td><a href="{% url 'order_update' order.id %}">Order #{{ order.id }}</a></td>
+                <td>{{ order.user.username }}</td>
+                <td>${{ order.total_price }}</td>
+                <td>
+                    <span class="order-status status-{{ order.status|lower }}">
+                        {{ order.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ order.date_added|date:"M d, Y H:i" }}</td>
+                <td>{{ order.shipping_address }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3 class="empty-title">No Orders Found</h3>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化状态计数
+    const statusCounts = {
+        all: document.querySelectorAll('tbody tr[data-status]').length,
+        pending: 0,
+        ordered: 0,
+        shipped: 0,
+        cancelled: 0,
+        refunded: 0
+    };
+
+    // 统计各状态数量
+    document.querySelectorAll('tbody tr[data-status]').forEach(row => {
+        const status = row.dataset.status;
+        if (statusCounts.hasOwnProperty(status)) {
+            statusCounts[status]++;
+        }
+    });
+
+    // 创建计数徽章
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        const status = button.dataset.status;
+        const count = status === 'all' ? statusCounts.all : statusCounts[status];
+        const badge = document.createElement('span');
+        badge.className = 'count-badge';
+        badge.textContent = count;
+        button.appendChild(badge);
+    });
+
+    // 筛选功能
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 更新按钮状态
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.querySelector('.count-badge');
+                btn.querySelector('.count-badge');
+            });
+            this.classList.add('active');
+            if(this.querySelector('.count-badge')) {
+                this.querySelector('.count-badge');
+                this.querySelector('.count-badge');
+            }
+
+            // 执行筛选
+            const status = this.dataset.status;
+            const rows = document.querySelectorAll('tbody tr[data-status]');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const show = status === 'all' || row.dataset.status === status;
+                row.style.display = show ? '' : 'none';
+                if(show) visibleCount++;
+            });
+
+            // 处理空状态
+            const emptyRow = document.querySelector('.empty-state').closest('tr');
+            const tbody = document.querySelector('tbody');
+            
+            // 移除旧提示
+            const existingMessages = tbody.querySelectorAll('.no-result');
+            existingMessages.forEach(msg => msg.remove());
+
+            if(visibleCount === 0) {
+                const newRow = document.createElement('tr');
+                newRow.className = 'no-result';
+                newRow.innerHTML = `
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <h3 class="empty-title">No ${status} orders found</h3>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(newRow);
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

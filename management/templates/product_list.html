@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vendor Product List{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<h1>Product management</h1>
+
+<div class="stats">
+    Total Products: <span id="totalCount">{{ object_list|length }}</span>
+</div>
+
+    <div class="search-box">
+        <form action="." method="GET">
+            <input type="text" 
+                name="query" 
+                placeholder="Search by toys ID or Name" 
+                value="{{ request.GET.get_query}}">
+            <button type="submit" style="display:none">Submit</button>
+        </form>
+    </div>
+
+    {% if request.GET.query %}
+    <a href="{% url 'vendor_product_list' %}" class="back-button">Back to All Products</a>
+    {% endif %}
+
+<table>
+    <a href="{% url "product_add" %}">Add Product</a>
+    <tr>
+        <th>Thumbnail</th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>State</th>
+        <th>Actions</th>
+    </tr>         
+    {% for product in object_list %}
+    <tr>
+        {% if product.thumbnail %}
+        <td><img src="{{product.thumbnail.url}}"></td>
+        {% else %}
+                <td><img src="{% static 'img/default-thumbnail.jpg' %}" 
+                     alt="No Image"
+                     class="product-thumbnail">
+                </td>
+              {% endif %}
+        <td>{{product.id}}</td>
+        <td><a href="{% url "product_update" product.id %}">{{product.name}}</a></td>
+        <td>{{product.price}}</td>
+
+        {% if product.is_show %}
+        <td> on sale </td>
+        {% else %}
+        <td>hidden </td>
+        {% endif %}
+
+        <td>
+            <form action="{% url 'product_delete' product.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Delete">
+            </form>
+        </td>
+        
+    </tr>
+    {% endfor %}
+</table>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 状态计数器
+        const counters = {
+            all: {{ object_list|length }},
+            onsale: document.querySelectorAll('tr[data-status="onsale"]').length,
+            hidden: document.querySelectorAll('tr[data-status="hidden"]').length
+        };
+
+
+</style>
+{% endblock %}
+
+

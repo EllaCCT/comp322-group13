@@ -1,0 +1,635 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}ISI STORE | Ecommerce Website design{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      :root {
+        /* 字体大小变量 */
+        --text-xs: 12px;
+        --text-sm: 14px;
+        --text-base: 16px;
+        --text-lg: 18px;
+        --text-xl: 20px;
+        --text-2xl: 24px;
+        --text-3xl: 30px;
+        --text-4xl: 36px;
+        --text-5xl: 48px;
+        
+        /* 图标大小变量 */
+        --icon-sm: 20px;
+        --icon-base: 20px;
+        --icon-lg: 30px;
+      }
+      
+      .large-text {
+        --text-xs: 18px;
+        --text-sm: 22px;
+        --text-base: 26px;
+        --text-lg: 24px;
+        --text-xl: 26px;
+        --text-2xl: 30px;
+        --text-3xl: 30px;
+        --text-4xl: 42px;
+        --text-5xl: 54px;
+        
+        --icon-sm: 26px;
+        --icon-base: 28px;
+        --icon-lg: 38px;
+      }
+
+      @keyframes textScale {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+      }
+
+      body {
+        transition: 
+          font-size 0.3s ease,
+          color 0.3s ease,
+          background 0.3s ease;
+      }
+
+      .navbar,
+      .footer {
+        transition: all 0.3s ease;
+      }
+      
+      /* 购物车图标样式 */
+      .cart-link {
+        justify-content: flex-start !important;
+        padding: 8px 0 !important;
+    }
+      
+      .cart-link img {
+        width: var(--icon-base);
+        height: var(--icon-base);
+        transition: transform 0.2s;
+        min-width: 20px; /* 保持最小可点击区域 */
+        min-height: 20px;
+        margin-right: 8px;
+
+      }
+
+      #MenuItems li:last-child {
+        border-bottom: none;
+        padding-bottom: 20px;
+    }
+      
+      .cart-quantity {
+        font-size: var(--text-sm);
+        background: #223a77;
+        color: white;
+        border-radius: 50%;
+        width: calc(var(--text-sm) * 1.5);
+        height: calc(var(--text-sm) * 1.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+      
+      /* 菜单图标 */
+      .menu-icon {
+        width: var(--icon-sm);
+        height: var(--icon-sm);
+        min-width: 20px;
+        min-height: 20px;
+      }
+      
+      /* 无障碍设置图标 */
+      .settings-gear {
+        width: var(--icon-sm);
+        height: var(--icon-sm);
+        min-width: 30px;
+        min-height: 30px;
+      }
+      
+      /* 响应式适配 */
+      @media (max-width: 768px) {
+        .cart-link img {
+          width: var(--icon-sm);
+          height: var(--icon-sm);
+        }
+        
+        .menu-icon {
+          width: calc(var(--icon-sm) * 0.9);
+          height: calc(var(--icon-sm) * 0.9);
+        }
+      }
+
+      /* 应用字体变量到具体元素 */
+      body {
+        font-size: var(--text-base);
+      }
+      
+      h1 {
+        font-size: var(--text-4xl);
+        margin-bottom: 1.5rem;
+      }
+      
+      h2 {
+        font-size: var(--text-3xl);
+      }
+      
+      h3 {
+        font-size: var(--text-2xl);
+      }
+      
+      .s-tittle {
+        font-size: var(--heading-lg);
+      }
+      
+      .btn {
+        font-size: var(--text-xs);
+      }
+      
+      /* 商品标题 */
+      .col-4 h4 {
+        font-size: var(--text-xl);
+      }
+      
+      /* 价格文字 */
+      .price {
+        font-size: var(--text-xl);
+      }
+      
+      /* 响应式适配 */
+      @media (max-width: 768px) {
+        :root {
+          --text-4xl: 30px;
+          --text-3xl: 24px;
+          --text-2xl: 20px;
+        }
+        
+        .large-text {
+          --text-4xl: 36px;
+          --text-3xl: 28px;
+          --text-2xl: 24px;
+        }
+        
+        .col-2 h1 {
+          font-size: var(--text-3xl);
+          line-height: 1.2;
+        }
+      }
+
+      /* 控制面板 */
+      #accessibility-panel {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .settings-gear {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .settings-gear:hover {
+        transform: rotate(45deg);
+      }
+
+      .accessibility-controls {
+        display: none;
+        position: absolute;
+        bottom: 50px;
+        right: 0;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgb(255, 255, 255);
+      }
+
+      .accessibility-controls.show {
+        display: block;
+      }
+
+      .accessibility-btn {
+        display: block;
+        margin: 5px 0;
+        padding: 8px 12px;
+        background:rgb(255, 255, 255);
+        border: 1px solid #ddd;
+        color: #333;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .accessibility-btn:hover {
+        background: #e0e0e0;
+      }
+
+      .accessibility-btn.active {
+        background: var(--secondary-color);
+        color: var(--background-color);
+      }
+
+      /* 移动端专用样式 */
+      @media only screen and (max-width:800px) {
+        .header {
+            padding-top: 60px;
+        }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgb(255, 255, 255);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgb(255, 255, 255);
+            z-index: 1000;
+        }
+
+            .navbar .logo img {
+                width: 180px !important;
+                max-width: 60vw;
+                height: auto;
+            }
+
+            .menu-icon {
+              right: 50px;
+              top: 50%;
+              position: absolute; 
+              transform: none;
+              margin: 0;
+            }
+            #MenuItems {
+              position: fixed;
+              top: 60px !important;
+              left: 0;
+              right: 0;
+              background: #fff;
+              z-index: 999;
+              max-height: 0;
+              overflow-y: hidden;
+              transition: all 0.3s;
+              padding: 0 20px !important; /* 添加左右内边距 */
+          }
+          #MenuItems li {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+    
+        #MenuItems li a,
+        #MenuItems li form button {
+            width: 100%;
+            display: block;
+            padding: 8px 0;
+            font-size: var(--text-base);
+            color: #333 !important;
+            text-align: left;
+        }
+
+        #MenuItems li form {
+          width: 100%;
+      }
+  
+      #MenuItems li form button {
+          width: 100%;
+          text-align: left;
+          background: none !important;
+          border: none !important;
+      }
+
+
+
+            #MenuItems.show-menu {
+              overflow: visible;
+              max-height: 1000px;
+            }
+
+            .content-section {
+                padding: 20px 15px;
+                margin-top: 0 !important;
+                position: relative;
+                z-index: 1;
+            }
+        }
+
+        /* 通用修正 - 保留旧版优化 */
+        .content-section {
+            padding-top: 80px;
+            transition: padding 0.3s;
+        }
+
+        @media (min-width: 801px) {
+            .content-section {
+                padding-top: 0;
+            }
+        }
+        html, body {
+          height: 100%;
+      }
+      body {
+          display: flex;
+          flex-direction: column;
+      }
+      .page-content {
+          flex: 1 0 auto;
+      }
+      .footer {
+          flex-shrink: 0;
+      }
+
+      .reset-btn {
+        background: #ffebee !important;
+        border-color: #ffcdd2 !important;
+        color: #c62828 !important;
+      }
+    
+      .reset-btn:hover {
+        background: #ffcdd2 !important;
+      }
+    
+      /* 调整控制面板位置 */
+      .accessibility-controls {
+        bottom: 55px;
+        min-width: 120px;
+      }
+
+      .navbar form button[type="submit"] {
+        font-size: inherit !important;
+        color: #2b2a69 !important;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        cursor: pointer;
+        font-family: "Roboto Condensed", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+
+
+
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #d31820; /*  */
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.cart-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+@media only screen and (max-width:800px) {
+  .cart-badge {
+    top: -8px;
+    right: -8px;
+  }
+}
+
+
+#MenuItems li a[href="#"] {
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+
+
+
+<body>
+  <div class="page-content">
+      <!-- 公共Header部分 -->
+      <div class="header">
+        <div class="container">
+          <div class="navbar" style="padding-right: 0px;">
+            <div class="logo"><a href="{% url 'index' %}">
+              <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
+            </div></a>
+
+            <nav>
+              <img src="{% static 'img/me.svg' %}" class="menu-icon" onclick="menutoggle()" alt="Menu">
+              <ul id="MenuItems">
+                {% if user.is_superuser %}
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'vendor_product_list' %}">Product management</a></li>
+                <li><a href="{% url 'vendor_order_list' %}">Order management</a></li>
+                {% else %}
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'product' %}">Products</a></li>
+                <li><a href="{% url 'order_list' %}">Order</a></li>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                <li><a href="#" style="color: #2b2a69;">Hi, {{ user.username }}</a></li>
+                <li>
+                  <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="color: #2b2a69; background:none; border:none; padding:0;">Logout</button>
+                  </form>
+                </li>
+                {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+                
+                {% if not user.is_superuser %}
+                <li>
+                  <a href="{% url 'cart' %}" class="cart-link">
+                    <img src="{% static 'img/car.png' %}" alt="Cart">
+                    {% if cart_quantity > 0 %}
+                    <span class="cart-badge">{{ cart_quantity }}</span>
+                    {% endif %}
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+
+          {% block header_content %}{% endblock %}
+        </div>
+      </div>
+
+      <div id="accessibility-panel">
+        <img src="{% static 'img/settings.svg' %}" class="settings-gear" alt="无障碍设置">
+        <div class="accessibility-controls">
+          <button data-mode="large-text" class="accessibility-btn">Larger font</button>
+          <button class="accessibility-btn reset-btn">Reset</button>
+        </div>
+      </div>
+
+      <!-- 主要內容區塊 -->
+      <div class="content-section">
+      {% block content %}{% endblock %}
+      </div>
+  </div>
+
+  <!-- 公共Footer -->
+  <div class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="footer-col-2">
+          <img src="{% static 'img/logo-receipt_400x.avif' %}" alt="Footer Logo">
+          <p>For almost thirty years, we have proudly built our family-owned neighborhood toy store around outstanding quality, value, customer service, and heart.</p>
+        </div>
+      </div>
+      <hr>
+      <p>This website was created by MPU ISI Group 13</p>
+    </div>
+  </div>
+
+  <script>
+    // 无障碍功能
+    function toggleMode(mode) {
+        document.body.classList.toggle(mode);
+        localStorage.setItem(mode, document.body.classList.contains(mode));
+        updateButtonState(mode);
+        
+        // 手动切换时才添加动画
+        document.documentElement.style.animation = 'textScale 0.3s ease';
+        setTimeout(() => {
+            document.documentElement.style.animation = '';
+        }, 300);
+    }
+
+    function updateButtonState(mode) {
+        const btn = document.querySelector(`[data-mode="${mode}"]`);
+        if (btn) {
+            btn.classList.toggle('active', document.body.classList.contains(mode));
+        }
+    }
+
+    // 初始化无障碍设置 (修改核心部分)
+    function initAccessibility() {
+        // 临时禁用过渡效果
+        const originalTransition = document.body.style.transition;
+        document.body.style.transition = 'none';
+
+        // 应用存储设置
+        if (localStorage.getItem('large-text') === 'true') {
+            document.body.classList.add('large-text');
+            updateButtonState('large-text');
+        }
+
+        // 强制同步渲染
+        document.body.offsetHeight; // 触发重绘
+
+        // 恢复原始过渡设置
+        document.body.style.transition = originalTransition;
+    }
+
+    // 面板交互
+    const settingsGear = document.querySelector('.settings-gear');
+    const controlsPanel = document.querySelector('.accessibility-controls');
+
+    settingsGear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        controlsPanel.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#accessibility-panel')) {
+            controlsPanel.classList.remove('show');
+        }
+    });
+
+    // 按钮点击处理
+    controlsPanel.addEventListener('click', (e) => {
+        if (e.target.dataset.mode) {
+            toggleMode(e.target.dataset.mode);
+        }
+    });
+
+    // 重置按钮
+    document.querySelector('.reset-btn').addEventListener('click', () => {
+        // 禁用过渡重置
+        document.body.style.transition = 'none';
+        document.body.classList.remove('large-text');
+        localStorage.removeItem('large-text');
+        document.querySelectorAll('.accessibility-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        controlsPanel.classList.remove('show');
+        
+        // 强制同步渲染后恢复
+        document.body.offsetHeight;
+        document.body.style.transition = '';
+    });
+
+    // 菜单切换功能
+    let isMenuOpen = false;
+    const menu = document.getElementById('MenuItems');
+
+    function menutoggle() {
+        isMenuOpen = !isMenuOpen;
+        if (isMenuOpen) {
+            menu.style.maxHeight = menu.scrollHeight + "px";
+            menu.classList.add('show-menu');
+        } else {
+            menu.style.maxHeight = "0";
+            menu.classList.remove('show-menu');
+        }
+    }
+
+    function updateContentPadding() {
+        const content = document.querySelector('.content-section');
+        if (window.innerWidth <= 800) {
+            content.style.paddingTop = '60px';
+        } else {
+            content.style.paddingTop = '';
+        }
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        initAccessibility();
+        updateContentPadding();
+        
+        // 点击菜单外部关闭菜单
+        document.addEventListener('click', function(event) {
+            const isClickInsideMenu = menu.contains(event.target);
+            const isClickOnIcon = event.target.closest('.menu-icon');
+
+            if (isMenuOpen && !isClickInsideMenu && !isClickOnIcon) {
+                menutoggle();
+            }
+        });
+
+        // 滚动时关闭菜单（移动端）
+        window.addEventListener('scroll', function() {
+            if (isMenuOpen && window.innerWidth <= 800) {
+                menutoggle();
+            }
+        });
+    });
+
+    // 响应式调整
+    window.addEventListener('resize', updateContentPadding);
+</script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

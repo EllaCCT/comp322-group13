@@ -1,0 +1,56 @@
+<!-- templates/users/login.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="Login-page">
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <div class="form-container" style="height: 300px;">
+            <div class="form-btn">
+              <span style="font-size: var(--text-2xl);">Login</span>
+            </div>
+
+            <form action="{% url 'login' %}" method="post" style="right: 0px; left: 0px; top: 60px;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" class="form-control" name="username" placeholder="Enter Username" style="font-size: var(--text-sm);">
+                </div>
+          
+                <br>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" placeholder="Enter Password" style="font-size: var(--text-sm);">
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary btn-sm" style="font-size: var(--text-sm);">Log in</button>
+                <br>
+                <a href="{% url 'signup' %}" style="font-size: 14px;">Don't have an account? Register here</a>
+            </form>
+          </div>
+        </div>
+        <div class="col-2">
+            <img src="{% static 'img/homepage.webp' %}" alt="Homepage">   
+        </div>
+      </div>
+    </div>
+</div>
+<!--
+<style>
+  .error-message {
+    color: red;
+    font-size: var(--text-xs);
+    margin-top: 5px;
+    height: 15px;
+  }
+  
+  /* 調整表單容器高度以適應錯誤訊息 */
+  .form-container {
+    height: auto;
+    padding-bottom: 30px;
+  }
+</style> -->
+{% endblock %}
+

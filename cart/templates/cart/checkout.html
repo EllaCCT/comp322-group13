@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+
+<style>
+
+
+
+/* Form elements */
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input {
+    background-color: #fefefe;
+}
+
+button {
+    background-color: #223a77;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover {
+    background-color: #223a77;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 20px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+}
+
+</style>
+
+<form method="post" action="{% url 'checkout' %}">
+    {% csrf_token %}
+    <div>
+        <label for="full_name">Full Name:</label>
+           {{ request.user.username|default:'' }}
+    </div>
+    <div>
+        <label for="email">Email:</label>
+            {{ request.user.email|default:'' }}
+    <!-- checkout.html -->
+<div>
+    <label for="shipping_address">Address:</label> 
+            {{ initial_data.shipping_address|default:'' }}
+        
+</div>
+
+    <button type="submit">Place Order</button>
+</form>
+
+
+
+{% endblock %}

@@ -1,0 +1,196 @@
+<!-- templates/users/signup.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="Login-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-2">
+                <div class="form-container" style="height: 450px;">
+                    <div class="form-btn">
+                        <span style="font-size: var(--text-xl);">Sign Up</span>
+                    </div>
+
+                    <form method="post" style="right: 0px; left: 0px; top: 80px;">
+                        {% csrf_token %}
+                        
+                        {# 错误信息显示 #}
+                        {% if form.errors %}
+                        <div class="alert alert-danger" style="font-size: var(--text-sm);">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {# 用户名 #}
+                        <div class="form-group">
+                            <input type="text" class="form-control" 
+                                   name="username" 
+                                   placeholder="Username"
+                                   value="{{ form.username.value|default:'' }}"
+                                   style="font-size: var(--text-base);">
+                        </div>
+
+                        {# 电子邮件 #}
+                        <div class="form-group">
+                            <input type="email" class="form-control" 
+                                   name="email" 
+                                   placeholder="Email"
+                                   value="{{ form.email.value|default:'' }}"
+                                   style="font-size: var(--text-base);">
+                        </div>
+
+                        {# 地址 #}
+                        <div class="form-group">
+                            <input type="text" class="form-control" 
+                                   name="address" 
+                                   placeholder="Address"
+                                   value="{{ form.address.value|default:'' }}"
+                                   style="font-size: var(--text-base);">
+                        </div>
+
+                        {# 密码 #}
+                        <div class="form-group">
+                            <input type="password" class="form-control" 
+                                   name="password1" 
+                                   placeholder="Password"
+                                   style="font-size: var(--text-base);">
+                        </div>
+
+                        {# 确认密码 #}
+                        <div class="form-group">
+                            <input type="password" class="form-control" 
+                                   name="password2" 
+                                   placeholder="Confirm Password"
+                                   style="font-size: var(--text-base);">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm" style="font-size: var(--text-sm);">Sign Up</button>
+                        <br>
+                        <a href="{% url 'login' %}" style="font-size: var(--text-sm);">Already have an account? Login here</a>
+                    </form>
+                </div>
+            </div>
+            <div class="col-2">
+                <img src="{% static 'img/homepage.webp' %}" alt="Homepage">   
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+
+<!-- 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.form-container form');
+  const emailInput = form.querySelector('input[name="email"]');
+  const password1Input = form.querySelector('input[name="password1"]');
+  const password2Input = form.querySelector('input[name="password2"]');
+  
+  // 創建錯誤提示元素
+  function createErrorElement(input, message) {
+    let errorElement = input.nextElementSibling;
+    if (!errorElement || !errorElement.classList.contains('error-message')) {
+      errorElement = document.createElement('div');
+      errorElement.className = 'error-message';
+      errorElement.style.color = 'red';
+      errorElement.style.fontSize = 'var(--text-xs)';
+      errorElement.style.marginTop = '5px';
+      input.parentNode.insertBefore(errorElement, input.nextSibling);
+    }
+    errorElement.textContent = message;
+    return errorElement;
+  }
+
+  // Email 驗證
+  emailInput.addEventListener('input', function() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailInput.value)) {
+      createErrorElement(emailInput, '請輸入有效的電子郵件地址');
+    } else {
+      createErrorElement(emailInput, '');
+    }
+  });
+
+  // 密碼強度驗證
+  password1Input.addEventListener('input', function() {
+    const password = password1Input.value;
+    let message = '';
+    
+    if (password.length < 8) {
+      message = '密碼至少需要8個字符';
+    } else if (!/[A-Z]/.test(password)) {
+      message = '需要至少一個大寫字母';
+    } else if (!/[a-z]/.test(password)) {
+      message = '需要至少一個小寫字母';
+    } else if (!/[0-9]/.test(password)) {
+      message = '需要至少一個數字';
+    }
+    
+    createErrorElement(password1Input, message);
+    
+    // 如果第二次密碼已輸入，則立即驗證是否匹配
+    if (password2Input.value) {
+      password2Input.dispatchEvent(new Event('input'));
+    }
+  });
+
+  // 密碼匹配驗證
+  password2Input.addEventListener('input', function() {
+    if (password1Input.value !== password2Input.value) {
+      createErrorElement(password2Input, '密碼不匹配');
+    } else {
+      createErrorElement(password2Input, '');
+    }
+  });
+
+  // 表單提交前最終檢查
+  form.addEventListener('submit', function(e) {
+    let isValid = true;
+    
+    // 觸發所有輸入事件以確保顯示最新錯誤
+    emailInput.dispatchEvent(new Event('input'));
+    password1Input.dispatchEvent(new Event('input'));
+    password2Input.dispatchEvent(new Event('input'));
+    
+    // 檢查是否有錯誤訊息
+    document.querySelectorAll('.error-message').forEach(el => {
+      if (el.textContent) isValid = false;
+    });
+    
+    if (!isValid) {
+      e.preventDefault();
+      alert('請修正表單中的錯誤後再提交');
+    }
+  });
+});
+</script>
+
+
+{% endblock %}
+
+-->
+
+<!--    <style>
+        .error-message {
+          color: red;
+          font-size: var(--text-xs);
+          margin-top: 5px;
+          height: 15px;
+        }
+        
+        /* 調整表單容器高度以適應錯誤訊息 */
+        .form-container {
+          height: auto;
+          padding-bottom: 30px;
+        }
+      </style>
+-->
