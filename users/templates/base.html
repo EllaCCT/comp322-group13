@@ -427,7 +427,7 @@
         <div class="container">
           <div class="navbar" style="padding-right: 0px;">
             <div class="logo"><a href="{% url 'index' %}">
-              <img src="{% static 'img/logo-receipt_400x.avif' %}" width="300" alt="Logo">
+              <img src="{% static 'img/logo2.png' %}" width="300" alt="Logo">
             </div></a>
 
             <nav>
@@ -459,12 +459,13 @@
                 <li>
                   <a href="{% url 'cart' %}" class="cart-link">
                     <img src="{% static 'img/car.png' %}" alt="Cart">
-                    {% if cart_quantity > 0 %}
+                    {% if user.is_authenticated and cart_quantity > 0 %}
                     <span class="cart-badge">{{ cart_quantity }}</span>
                     {% endif %}
                   </a>
                 </li>
                 {% endif %}
+                
               </ul>
             </nav>
           </div>
@@ -492,7 +493,7 @@
     <div class="container">
       <div class="row">
         <div class="footer-col-2">
-          <img src="{% static 'img/logo-receipt_400x.avif' %}" alt="Footer Logo">
+          <img src="{% static 'img/logo2.png' %}" alt="Footer Logo">
           <p>For almost thirty years, we have proudly built our family-owned neighborhood toy store around outstanding quality, value, customer service, and heart.</p>
         </div>
       </div>
@@ -502,18 +503,21 @@
   </div>
 
   <script>
-    // 无障碍功能
     function toggleMode(mode) {
-        document.body.classList.toggle(mode);
-        localStorage.setItem(mode, document.body.classList.contains(mode));
-        updateButtonState(mode);
-        
-        // 手动切换时才添加动画
-        document.documentElement.style.animation = 'textScale 0.3s ease';
-        setTimeout(() => {
-            document.documentElement.style.animation = '';
-        }, 300);
-    }
+      const isManualToggle = !document.body.classList.contains(mode);
+      document.body.classList.toggle(mode);
+      localStorage.setItem(mode, document.body.classList.contains(mode));
+      updateButtonState(mode);
+      
+      // 只有手動切換時才添加動畫
+      if (isManualToggle) {
+          document.documentElement.style.animation = 'textScale 0.3s ease';
+          setTimeout(() => {
+              document.documentElement.style.animation = '';
+          }, 300);
+      }
+  }
+  
 
     function updateButtonState(mode) {
         const btn = document.querySelector(`[data-mode="${mode}"]`);
@@ -524,22 +528,31 @@
 
     // 初始化无障碍设置 (修改核心部分)
     function initAccessibility() {
-        // 临时禁用过渡效果
-        const originalTransition = document.body.style.transition;
-        document.body.style.transition = 'none';
-
-        // 应用存储设置
-        if (localStorage.getItem('large-text') === 'true') {
-            document.body.classList.add('large-text');
-            updateButtonState('large-text');
-        }
-
-        // 强制同步渲染
-        document.body.offsetHeight; // 触发重绘
-
-        // 恢复原始过渡设置
-        document.body.style.transition = originalTransition;
-    }
+      // 禁用所有元素的過渡效果
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+          el.style.transition = 'none';
+          el.style.animation = 'none';
+      });
+  
+      // 應用存儲設置
+      if (localStorage.getItem('large-text') === 'true') {
+          document.body.classList.add('large-text');
+          updateButtonState('large-text');
+      }
+  
+      // 強制同步渲染
+      document.body.offsetHeight; // 觸發重繪
+  
+      // 恢復原始過渡設置
+      setTimeout(() => {
+          allElements.forEach(el => {
+              el.style.transition = '';
+              el.style.animation = '';
+          });
+      }, 0);
+  }
+  
 
     // 面板交互
     const settingsGear = document.querySelector('.settings-gear');

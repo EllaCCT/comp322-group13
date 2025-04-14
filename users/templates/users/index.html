@@ -24,148 +24,91 @@
 </div>
 </div>
 
-<!-- 分类展示区域 -->
-<div class="cate">
-  <div class="small-container">
-    <div class="row">
-      <div class="col-3">
-        <img src="{% static 'img/toy1.jpg' %}" alt="Toy 1">
+    <div class="small-container">
+      <h2 class="s-tittle" style="font-size: 28px !important;">Featured Products</h2>
+
+
+      <div class="row">
+        {% for product in products|slice:":4" %}
+        <div class="col-4">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% if product.thumbnail %}
+              <img src="{{ product.thumbnail.url }}" 
+                   alt="{{ product.name }}"
+                   style="width: 200px; height: 200px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                   alt="No Image"
+                   style="width: 200px; height: 200px; object-fit: cover;">
+            {% endif %}
+          </a>
+          <h4>{{ product.name }}</h4>
+          {% if product.is_sale %}
+            <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
+          {% else %}
+            <p class="price">${{ product.price }}</p>
+          {% endif %}
+        </div>
+        {% empty %}
+
+        {% endfor %}
       </div>
-      <div class="col-3">
-        <img src="{% static 'img/toy2.jpg' %}" alt="Toy 2">
+      
+      <div class="row">
+        {% for product in products|slice:"4:8" %}
+        <div class="col-4">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% if product.thumbnail %}
+              <img src="{{ product.thumbnail.url }}" 
+                   alt="{{ product.name }}"
+                   style="width: 200px; height: 200px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'img/default-thumbnail.jpg' %}" 
+                   alt="No Image"
+                   style="width: 200px; height: 200px; object-fit: cover;">
+            {% endif %}
+          </a>
+          <h4>{{ product.name }}</h4>
+          {% if product.is_sale %}
+            <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
+          {% else %}
+            <p class="price">${{ product.price }}</p>
+          {% endif %}
+        </div>
+        {% empty %}
+
+        {% endfor %}
       </div>
-      <div class="col-3">
-        <img src="{% static 'img/toy3.jpg' %}" alt="Toy 3">
-      </div>
-    </div>
-
-<div class="small-container">
-  <h2 class="s-tittle">Featured Products</h2>
-  <div class="row">
-    <!-- 第一个特色商品 -->
-    <div class="col-4">
-      {% with product=products.0 %}
-        {% if product %}
-          <a href="{% url 'product_detail' product.slug %}">
-            {% if product.thumbnail %}
-              <img src="{{ product.thumbnail.url }}" 
-                   alt="{{ product.name }}"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% else %}
-              <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                   alt="No Image"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% endif %}
-          </a>
-          <h4>{{ product.name }}</h4>
-          {% if product.is_sale %}
-            <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
-          {% else %}
-            <p class="price">${{ product.price }}</p>
-          {% endif %}
-        {% else %}
-          <img src="{% static 'img/default-thumbnail.jpg' %}" 
-               alt="Default Toy"
-               style="width: 200px; height: 200px; object-fit: cover;">
-          <h4>Default Toy</h4>
-          <p class="price">$11.00</p>
-        {% endif %}
-      {% endwith %}
-    </div>
-
-    <!-- 第二个特色商品 -->
-    <div class="col-4">
-      {% with product=products.1 %}
-        {% if product %}
-          <a href="{% url 'product_detail' product.slug %}">
-            {% if product.thumbnail %}
-              <img src="{{ product.thumbnail.url }}" 
-                   alt="{{ product.name }}"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% else %}
-              <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                   alt="No Image"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% endif %}
-          </a>
-          <h4>{{ product.name }}</h4>
-          {% if product.is_sale %}
-            <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
-          {% else %}
-            <p class="price">${{ product.price }}</p>
-          {% endif %}
-        {% else %}
-          <img src="{% static 'img/default-thumbnail.jpg' %}" 
-               alt="Default Toy"
-               style="width: 200px; height: 200px; object-fit: cover;">
-          <h4>Default Toy</h4>
-          <p class="price">$11.00</p>
-        {% endif %}
-      {% endwith %}
-    </div>
-
-    <!-- 第三个特色商品 -->
-    <div class="col-4">
-      {% with product=products.2 %}
-        {% if product %}
-          <a href="{% url 'product_detail' product.slug %}">
-            {% if product.thumbnail %}
-              <img src="{{ product.thumbnail.url }}" 
-                   alt="{{ product.name }}"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% else %}
-              <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                   alt="No Image"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% endif %}
-          </a>
-          <h4>{{ product.name }}</h4>
-          {% if product.is_sale %}
-            <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
-          {% else %}
-            <p class="price">${{ product.price }}</p>
-          {% endif %}
-        {% else %}
-          <img src="{% static 'img/default-thumbnail.jpg' %}" 
-               alt="Default Toy"
-               style="width: 200px; height: 200px; object-fit: cover;">
-          <h4>Default Toy</h4>
-          <p class="price">$11.00</p>
-        {% endif %}
-      {% endwith %}
-    </div>
-
-    <!-- 第四个特色商品 -->
-    <div class="col-4">
-      {% with product=products.3 %}
-        {% if product %}
-          <a href="{% url 'product_detail' product.slug %}">
-            {% if product.thumbnail %}
-              <img src="{{ product.thumbnail.url }}" 
-                   alt="{{ product.name }}"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% else %}
-              <img src="{% static 'img/default-thumbnail.jpg' %}" 
-                   alt="No Image"
-                   style="width: 200px; height: 200px; object-fit: cover;">
-            {% endif %}
-          </a>
-          <h4>{{ product.name }}</h4>
-          {% if product.is_sale %}
-            <p class="price">${{ product.sale_price }} <del>${{ product.price }}</del></p>
-          {% else %}
-            <p class="price">${{ product.price }}</p>
-          {% endif %}
-        {% else %}
-          <img src="{% static 'img/default-thumbnail.jpg' %}" 
-               alt="Default Toy"
-               style="width: 200px; height: 200px; object-fit: cover;">
-          <h4>Default Toy</h4>
-          <p class="price">$11.00</p>
-        {% endif %}
-      {% endwith %}
-    </div>
-  </div>
-</div>
-</div>
+    
 {% endblock %}
+
+<style>
+  .col-4 p{
+    font-size: var(--text-lg) !important; 
+  }
+
+
+  .price {
+  font-size: var(--text-lg) !important; 
+  }
+
+  .price {
+    font-size: var(--text-lg) !important;
+    color: #223a77 !important;
+  }
+  
+  .price del {
+    font-size: var(--text-base) !important;
+    color: #999 !important;
+    margin-left: 5px;
+  }
+  
+  .s-tittle {
+    font-size: var(--text-4xl) !important;
+    color: #d31820 !important;
+    text-align: center !important;
+    margin: 80px auto 20px !important;
+    position: relative !important;
+    line-height: 60px !important;
+  }
+</style>

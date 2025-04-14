@@ -4,13 +4,16 @@ from products.models import Product,Category
 from django.contrib.auth import authenticate, login as login_auth
 from .forms import RegisterForm
 from users.models import Member
+import random
 
 #class IndexView(TemplateView):
     #template_name = 'users/index.html'
 
-def index(request): 
-    products=Product.objects.all()[0:8]
-    return render(request, 'users/index.html', {'products':products})
+def index(request):
+    # 只獲取 is_show=True 且 parent=None 的產品，然後隨機取8個
+    all_products = list(Product.objects.filter(is_show=True, parent=None))
+    random_products = random.sample(all_products, min(8, len(all_products)))
+    return render(request, 'users/index.html', {'products': random_products})
 
 def register(request):
     form = RegisterForm(request.POST or None)
