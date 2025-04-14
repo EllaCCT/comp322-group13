@@ -5,19 +5,30 @@ from products.models import Product, Category, Size, Color, ProductAttributes
 from django.views.generic import DetailView
 from django.shortcuts import redirect
 
-#class ProductDetailView(DetailView):
-    #model = Product
-    #template_name = 'users/product_detail.html'
-    #context_object_name = 'product'
+import bleach
 
-# def product_list(request):
-    # product = Product.objects.filter(is_show=True).prefetch_related('images')
-    #product = Product.objects.all()
-    # return render(request, 'products/product_list.html', {'product': product})
-
-#def product_detail(request,slug):
-    #product= get_object_or_404(Product.objects.prefetch_related('images'), slug=slug)
-    #return render(request, 'products/product_detail.html',{'product':product})
+def save_product(request):
+    if request.method == 'POST':
+        description = request.POST.get('description', '')
+        
+        # 定義允許的標籤和屬性
+        allowed_tags = ['p', 'a', 'img', 'b', 'i']
+        allowed_attrs = {
+            'a': ['href', 'target'],
+            'img': ['src', 'alt', 'width', 'height']
+        }
+        
+        # 清理 HTML 內容
+        cleaned_description = bleach.clean(
+            description,
+            tags=allowed_tags,
+            attributes=allowed_attrs,
+            strip=True  # 刪除非白名單標籤
+        )
+        
+        # 保存清理後的數據
+        product = Product(description=cleaned_description)
+        product.save()
 
 def product_list(request):
     products = Product.objects.filter(parent=None).filter(is_show=True).prefetch_related('images')

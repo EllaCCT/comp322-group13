@@ -25,7 +25,7 @@ OrderItemFormSet = inlineformset_factory(Order,OrderItem,
 
 ProductAttributeFormSet = inlineformset_factory(
     Product, ProductAttributes,
-    fields=('colors','sizes',),
+    fields=('colors','sizes','stock'), 
     extra = 4,
     can_delete=True
 )
@@ -58,7 +58,8 @@ class ProductListView(SuperUserRequiredMixin,ListView):
         if query:
             try:
                 # 嘗試將 query 轉換為數字來搜索 ID
-                queryset = queryset.filter(id__contains=query)
+                query_int = int(query)
+                queryset = queryset.filter(id__icontains=query_int)
             except ValueError:
                 # 若轉換失敗，則模糊搜索名稱
                 queryset = queryset.filter(name__icontains=query)
@@ -159,7 +160,16 @@ class OrderListView(SuperUserRequiredMixin,ListView):
         return HttpResponseForbidden('')
     
     def get_queryset(self): #目前此商家產品訂單
-        return Order.objects.filter(items__product__vendor=self.request.user).distinct().order_by('-date_added')
+        queryset = super().get_queryset().filter(items__product__vendor=self.request.user).distinct()
+        query = self.request.GET.get('query')
+        if query:
+            try:
+                query_int = int(query)
+                queryset = queryset.filter(id__icontains=query_int)
+            except ValueError:
+                queryset = queryset.filter(user__username__icontains=query)
+        return queryset.filter(items__product__vendor=self.request.user).distinct().order_by('-date_added')
+        #return Order.objects.filter(items__product__vendor=self.request.user).distinct().order_by('-date_added')
 
 class OrderUpdateView(SuperUserRequiredMixin,UpdateView):
     model = Order

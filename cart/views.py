@@ -1,9 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from products.models import Product
+from products.models import Product,ProductAttributes
 from order.models import Order, OrderItem
 from .cart import Cart
 from django.contrib import messages
+
+def redirect_back(request, fallback_url='/'):
+    """
+    返回上一页或备用URL
+    :param request: HttpRequest对象
+    :param fallback_url: 当没有Referer时的默认跳转地址
+    """
+    referer = request.META.get('HTTP_REFERER')
+    if referer:  # 安全验证（可选）
+        # 如果需要防止开放重定向，可以添加域名验证：
+        # if referer.startswith(settings.SITE_DOMAIN):
+        return HttpResponseRedirect(referer)
+    return redirect(fallback_url)
 
 @login_required(login_url='/login/')
 def cart(request):
@@ -56,12 +69,25 @@ def add_to_cart(request, product_id):
     color = request.POST.get('color')
     size = request.POST.get('size')
 
-    if quantity > product.stock:
-        messages.error(request, "Not enough stock!")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+    if color or size:
+        try:
+            attr=ProductAttributes.objects.get(product=product, colors__color=color, sizes__size=size)
+            if quantity > attr.stock:
+                messages.error(request, "These group has not enough stock!")
+                return redirect_back(request)
+        except ProductAttributes.DoesNotExist:
+            messages.error(request, "These group does not exist!")
+            return redirect_back(request)
     else:
-        cart.add(product, quantity=quantity, color=color, size=size)
-        return redirect('cart')
+        if quantity > product.stock:
+            messages.error(request, "Not enough stock!")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+    cart.add(product, quantity=quantity, color=color, size=size)
+    return redirect('cart')
+    
+    
 
 @login_required
 def checkout(request):
@@ -85,19 +111,27 @@ def checkout(request):
 
         for item in cart.items:
             products = Product.objects.get(id=item['product'].id)
-            quantity = item['quantity']
-            if(products.stock > quantity):
-                OrderItem.objects.create(
-                    order=order,
-                    product=item['product'],
-                    price=item['price'],
-                    quantity=quantity,
-                    color=item.get('color'),
-                    size=item.get('size')
+            
+            if item.get('color')or item.get('size'):
+                attr = ProductAttributes.objects.select_for_update().get(
+                product=products,
+                colors__color=item.get('color'),
+                sizes__size=item.get('size')
                 )
-                products.stock -= quantity
+                attr.stock -= item['quantity'] # 扣減組合庫有
+                attr.save()
+            else:
+                products.stock -= item['quantity']
                 products.save()
 
+            OrderItem.objects.create(
+                order=order,
+                product=products,
+                price=item['price'],
+                quantity=item['quantity'],
+                color=item.get('color'),
+                size=item.get('size')
+                )
         cart.clear()
         return redirect('order_detail', order_id=order.id)
     

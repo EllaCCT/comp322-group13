@@ -1,17 +1,27 @@
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext
+from django.utils.translation import gettext as _
 import re
 
 class ComplexPasswordValidator:
-    """
-    Validate whether the password contains minimum one uppercase, one digit and one symbol.
-    """
     def validate(self, password, user=None):
-        if re.search('[A-Z]', password)==None and re.search('[0-9]', password)==None:
+        # check letter
+        if not re.search(r'[A-Z]', password):
             raise ValidationError(
-                ugettext("This password is not strong."),
-                code='password_is_weak',
+                _("Password must contain at least 1 uppercase letter."),
+                code='password_no_upper',
+            )
+        # check digit
+        if not re.search(r'[0-9]', password):
+            raise ValidationError(
+                _("Password must contain at least 1 digit."),
+                code='password_no_digit',
+            )
+        # symbol check
+        if not re.search(r'[^a-zA-Z0-9]', password):
+            raise ValidationError(
+                _("Password must contain at least 1 symbol.(@#$%^&+=)"),
+                code='password_no_symbol',
             )
 
     def get_help_text(self):
-        return ugettext("Your password must contain at least 1 number, 1 uppercase and 1 non-alphanumeric character.")
+        return _("Password must contain at least 1 uppercase letter ,1 symbol and 1 digit.")

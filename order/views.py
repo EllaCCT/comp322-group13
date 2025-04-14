@@ -15,5 +15,8 @@ def order_list(request):
 @login_required
 def order_detail(request, order_id):
     # 显示订单详情
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(
+        Order.objects.prefetch_related('items__product'), 
+        id=order_id, 
+        user=request.user)
     return render(request, 'order/order_detail.html',{'order': order})

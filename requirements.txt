@@ -6,3 +6,4 @@ tzdata==2025.1
 django-ckeditor-5==0.2.17
 django-simpleui==2025.1.13
 django-taggit==6.1.0
+bleach==6.2.0

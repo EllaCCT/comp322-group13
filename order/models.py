@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Order(models.Model): 
     STATUS_CHOICES = [
-        ('Pending', 'Pending'),
+        #('Pending', 'Pending'),
         ('Ordered', 'Ordered'),
         ('Shipped', 'Shipped'),
         ('Cancelled', 'Cancelled'),
@@ -56,7 +56,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order,related_name='items',on_delete=models.CASCADE)
     product = models.ForeignKey('products.Product', related_name='items',on_delete=models.CASCADE)
-    price=models.PositiveIntegerField()
+    price=models.DecimalField(max_digits=10, decimal_places=2)
     quantity=models.PositiveIntegerField(default=1)
     size = models.CharField(max_length=10,null=True,blank=True,editable=False)
     color = models.CharField(max_length=20,null=True,blank=True,editable=False)

@@ -23,7 +23,7 @@
         <!-- 保持原有元数据部分结构不变 -->
         <div class="order-meta">
             <div class="meta-group">
-                <class="meta-item">
+                <div class="meta-item">
                     <span class="meta-label">Order Date:</span>
                     {{ order.date_added|date:"M d, Y H:i" }}  
                     <br/>                  
@@ -67,16 +67,24 @@
             <div class="order-item">
                 <div class="item-product">
                     {% if item.product.thumbnail %}
-                    <img src="{{ item.product.thumbnail.url }}" 
-                         alt="{{ item.product.name }}"
-                         class="product-thumb">
+                        <img src="{{ item.product.thumbnail.url }}" 
+                             alt="{{ item.product.name }}"
+                             class="product-thumb">
+                    {% else %}
+                        <div class="default-thumb">No Image</div>
                     {% endif %}
-                    <span class="product-name">{{ item.product.name }}{% if item.color %}</br>-Color:{{ item.color }} {% endif %} {% if item.size %} </br>  -Size:{{ item.size }} {% endif %}</span>
+                    <span class="product-name">
+                        {{ item.product.name|default:"Unknown Product" }}
+                        {% if item.color %}<br/>- Color: {{ item.color }}{% endif %}
+                        {% if item.size %}<br/>- Size: {{ item.size }}{% endif %}
+                    </span>
                 </div>
                 <div class="item-quantity">{{ item.quantity }}</div>
                 <div class="item-price">${{ item.price|floatformat:2 }}</div>
-                <div class="item-total">${{ item.total_price }}</div>
+                <div class="item-total">${{ item.total_price|floatformat:2 }}</div> <!-- 添加格式化 -->
             </div>
+            {% empty %}
+                <div class="no-items">No items in this order</div>
             {% endfor %}
 
             <!-- 修改总价对齐部分 -->

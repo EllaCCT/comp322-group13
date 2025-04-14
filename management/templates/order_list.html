@@ -18,7 +18,6 @@
         <!-- 状态筛选器 -->
         <div class="status-filter" id="statusFilter">
             <button class="filter-btn active" data-status="all">All</button>
-            <button class="filter-btn" data-status="pending">Pending</button>
             <button class="filter-btn" data-status="ordered">Ordered</button>
             <button class="filter-btn" data-status="shipped">Shipped</button>
             <button class="filter-btn" data-status="cancelled">Cancelled</button>
@@ -31,7 +30,7 @@
         <form action="." method="GET">
             <input type="text" 
                 name="query" 
-                placeholder="Search by order ID or Name" 
+                placeholder="Search by order ID or User Name" 
                 value="{{ request.GET.query}}">
             <button type="submit" style="display:none">Submit</button>
         </form>
