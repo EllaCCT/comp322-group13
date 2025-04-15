@@ -53,7 +53,11 @@
         <tbody>
             {% for item in order.items.all %}
                 <tr>
-                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.product.name }}
+                        {% if item.color %}<br/>- Color: {{ item.color }}{% endif %}
+                        {% if item.size %}<br/>- Size: {{ item.size }}{% endif %}
+                    </td>
+                   
                     <td>{{ item.quantity }}</td>
                     <td>${{item.total_price }}</td>
                 </tr>
