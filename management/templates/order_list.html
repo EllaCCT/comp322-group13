@@ -18,10 +18,10 @@
         <!-- 状态筛选器 -->
         <div class="status-filter" id="statusFilter">
             <button class="filter-btn active" data-status="all">All</button>
-            <button class="filter-btn" data-status="ordered">Ordered</button>
-            <button class="filter-btn" data-status="shipped">Shipped</button>
-            <button class="filter-btn" data-status="cancelled">Cancelled</button>
-            <button class="filter-btn" data-status="refunded">Refunded</button>
+            <button class="filter-btn" data-status="ordered">Ordered  <span class="count-badge"></span> </button>
+            <button class="filter-btn" data-status="shipped">Shipped <span class="count-badge"></span></button>
+            <button class="filter-btn" data-status="cancelled">Cancelled <span class="count-badge"></span></button>
+            <button class="filter-btn" data-status="refunded">Refunded <span class="count-badge"></span></button>
         </div>
     </div>
 
@@ -81,37 +81,91 @@
 </div>
 
 <style>
+        /* 新增以下样式 */
+        .filter-btn {
+          position: relative;
+          padding: 8px 16px;
+          border: 2px solid #e2e8f0;
+          background: white;
+          cursor: pointer;
+          font-weight: 500;
+          transition: all 0.2s;
+          font-size: 0.875rem;
+          padding-right: 32px !important;
+        }
+        
+        .filter-btn.active {
+          border-color: #223a77;
+          background: #223a77;
+          color: white;
+        }
+        
+        .count-badge {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background: rgb(33, 37, 142);
+          color: white;
+          font-size: 0.75rem;
+          min-width: 24px;
+          height: 24px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 6px;
+          font-weight: 600;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .filter-btn.active .count-badge {
+          background: white !important;
+          color: #223a77 !important;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 0 0 2px #223a77;
+        }
+        
+        .count-badge[data-count="0"] {
+          background: #94a3b8 !important;
+          opacity: 0.5;
+        }
+
+            /* 新增/修改容器样式 */
+            .status-filter {
+                display: flex;
+                gap: 0.8rem;        /* 控制按钮间距的核心属性 */
+                flex-wrap: wrap;    /* 允许按钮换行 */
+            }
+            
+        
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 初始化状态计数
-    const statusCounts = {
-        all: document.querySelectorAll('tbody tr[data-status]').length,
-        pending: 0,
-        ordered: 0,
-        shipped: 0,
-        cancelled: 0,
-        refunded: 0
-    };
-
-    // 统计各状态数量
-    document.querySelectorAll('tbody tr[data-status]').forEach(row => {
-        const status = row.dataset.status;
-        if (statusCounts.hasOwnProperty(status)) {
-            statusCounts[status]++;
-        }
-    });
-
-    // 创建计数徽章
-    document.querySelectorAll('.filter-btn').forEach(button => {
-        const status = button.dataset.status;
-        const count = status === 'all' ? statusCounts.all : statusCounts[status];
-        const badge = document.createElement('span');
-        badge.className = 'count-badge';
-        badge.textContent = count;
-        button.appendChild(badge);
-    });
+    // 替换原来的状态计数逻辑为：
+const statusCounts = {
+    all: document.querySelectorAll('tbody tr[data-status]').length,
+    ordered: 0,
+    shipped: 0,
+    cancelled: 0,
+    refunded: 0
+  };
+  
+  document.querySelectorAll('tbody tr[data-status]').forEach(row => {
+    const status = row.dataset.status;
+    if (statusCounts.hasOwnProperty(status)) {
+      statusCounts[status]++;
+    }
+  });
+  
+  document.querySelectorAll('.filter-btn').forEach(button => {
+    const status = button.dataset.status;
+    const count = status === 'all' ? statusCounts.all : statusCounts[status];
+    const badge = button.querySelector('.count-badge');
+    if (badge) {
+      badge.textContent = count;
+      badge.dataset.count = count;
+    }
+  });
 
     // 筛选功能
     const filterButtons = document.querySelectorAll('.filter-btn');

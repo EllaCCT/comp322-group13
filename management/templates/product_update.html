@@ -2,50 +2,112 @@
 {% load static %}
 
 {% block content %}
-{% csrf_token %}
+<style>
+    /* 全局表單元素间距控制 */
+    .form-section {
+        margin-bottom: 2rem !important;  /* 增大主区块间距 */
+    }
 
-<h1>Update</h1>
-<form method ="post" enctype="multipart/form-data">
+    /* 调整属性表单之间的间距 */
+    .attribute-form {
+        margin-bottom: 50px !important;
+        padding: 15px;                  /* 添加内间距 */
+        border: 1px solid #eee;        /* 可视化分隔 */
+    }
+
+    /* 产品图片表单间距 */
+    .image-form {
+        margin-bottom: 40px;
+        padding: 15px;
+        border: 1px solid #eee;
+    }
+
+    /* 所有label统一间距 */
+    label {
+        display: block;
+        margin: 12px 0 !important;
+    }
+
+    /* 覆盖Django默认p标签样式 */
+    form p {
+        margin: 1.5rem 0 !important;
+    }
+
+    /* 提交按钮自定义样式 */
+    input[type="submit"] {
+        background: #007bff !important;         /* 按钮背景色 */
+        color: white !important;                /* 文字颜色 */
+        border: none !important;                /* 移除默认边框 */
+        padding: 12px 30px !important;          /* 内边距 */
+        font-size: 16px !important;            /* 字号 */
+        cursor: pointer !important;             /* 鼠标手势 */
+        transition: all 0.3s ease !important;  /* 过渡动画 */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; /* 阴影 */
+
+        /* 布局 */
+        display: block !important;              /* 独占一行 */
+        margin:  0em left !important;         /* 上下间距 + 水平居中 */
+        width: fit-content !important;          /* 自适应内容宽度 */
+    }
+
+    input[type="submit"]:hover {
+        background: #0056b3 !important;         /* 深色背景 */
+        transform: translateY(-1px) !important; /* 轻微上浮 */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+    }
+
+    input[type="submit"]:active {
+        transform: translateY(0) !important;    /* 取消上浮 */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    }
+
+    br {
+        display: none;
+    }
+</style>
+
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.media }} 
-    {{ form.as_p }}
     
-    <!--<div>
-        <label>Status:</label>
-            {{ form.is_show }}
-            {{ form.is_sale }}
-    </div>-->
-    <h3>Product Attributes</h3>
-    {{ attribute_formset.management_form }}
-    {% for form in attribute_formset %}
-    <div>
-        <p>Color:{{ form.colors }}</p>
-        <p>Size:{{ form.sizes }}</p>
-        <p>Stock:{{ form.stock }}</p>        
+    <!-- 主表單區 -->
+    <div class="form-section">
+        <h1>Update</h1>
+        {{ form.media }}
+        {{ form.as_p }}
     </div>
-    {% endfor %}
 
-
-    <h3>Product Images</h3>
-    {{ image_formset.management_form }}
-    {% for form in image_formset %}
-    <div>
-        {% if form.instance.image %}
-        <img src="{{ form.instance.image.url }}" style="max-height: 100px;">
-        {% endif %}
-        
-        <table>
-        {{ form.image.label_tag }}
-        {{ form.image }}
-        
-        <!-- 添加缩略图上传字段 -->
-        {{ form.thumbnail.label_tag }}
-        {{ form.thumbnail }}
-        
-        </table>
+    <!-- 產品屬性區 -->
+    <div class="form-section">
+        <h3>Product Attributes</h3>
+        {{ attribute_formset.management_form }}
+        {% for form in attribute_formset %}
+        <div class="attribute-form">
+            <label>Color:{{ form.colors }}</label>
+            <label>Size:{{ form.sizes }}</label>
+            <label>Stock:{{ form.stock }}</label>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-    
+
+    <!-- 產品圖片區 -->
+    <div class="form-section">
+        <h3>Product Images</h3>
+        {{ image_formset.management_form }}
+        {% for form in image_formset %}
+        <div class="image-form">
+            {% if form.instance.image %}
+            <img src="{{ form.instance.image.url }}" style="max-height: 100px;">
+            {% endif %}
+            <div class="image-upload">
+                {{ form.image.label_tag }}
+                {{ form.image }}
+                {{ form.thumbnail.label_tag }}
+                {{ form.thumbnail }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
     <input type="submit" value="Save Product">
 </form>
 {% endblock %}

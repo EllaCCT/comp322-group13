@@ -29,6 +29,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 SESSION_COOKIE_SECURE = 86400
+# 默认会话过期时间（用于不信任浏览器的情况）
+SESSION_COOKIE_AGE = 900  # 15分钟（单位：秒）
+# 是否在浏览器关闭时过期（用于不信任浏览器的情况）
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 CART_SESSION_ID = 'cart'
 
 # Application definition
@@ -251,3 +255,4 @@ CKEDITOR_5_CONFIGS = {
 
 # Define a constant in settings.py to specify file upload permissions
 CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"  # Possible values: "staff", "authenticated", "any"
+

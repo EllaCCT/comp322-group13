@@ -28,16 +28,37 @@ def register(request):
 
     return render(request, 'users/signup.html',  {'form': form})
 
+#def login(request):
+    #if request.method == "POST":
+        #username = request.POST.get("username")
+        #password = request.POST.get("password")
+        #user = authenticate(request, username=username, password=password)
+        #if user is not None:
+            #login_auth(request, user)
+            #return redirect('index')
+    #return render(request, "users/login.html")
+
 def login(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
             login_auth(request, user)
+            
+            # 根据用户选择信任浏览器与否动态设置会话
+            if request.POST.get('trust_browser', False):
+                # 信任浏览器：长期保持（例如30天）
+                request.session.set_expiry(30 * 24 * 60 * 60)  # 30天
+                request.session['trusted_browser'] = True
+            else:
+                # 不信任：15分钟无操作后过期 + 关闭浏览器失效
+                request.session.set_expiry(900)  # 15分钟
+                request.session['trusted_browser'] = False
+            
             return redirect('index')
-    return render(request, "users/login.html")
-    
+    return render(request, 'users/login.html')
 
 def product(request):
     categories=Category.objects.all()

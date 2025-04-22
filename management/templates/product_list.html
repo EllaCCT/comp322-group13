@@ -4,6 +4,30 @@
 {% block title %}Vendor Product List{% endblock %}
 
 {% block content %}
+
+<style>
+    input[type="submit"][value="Delete"] {
+        min-width: 60px;  /* 確保按鈕有足夠寬度顯示文字 */
+        box-sizing: border-box;
+        background: #dc3545 !important;  /* 紅色背景 */
+        color: white !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        min-width: 60px;  /* 確保按鈕有足夠寬度顯示文字 */
+        text-align: center;
+    }
+
+    input[type="submit"][value="Delete"]:hover {
+        background: #c82333 !important;  /* 更深的紅色 */
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1) !important;
+    
+</style>
+
 {% csrf_token %}
 <h1>Product management</h1>
 
@@ -77,7 +101,7 @@
         };
 
 
-</style>
+</script>
 {% endblock %}
 
 

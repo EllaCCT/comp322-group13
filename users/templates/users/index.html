@@ -112,3 +112,24 @@
     line-height: 60px !important;
   }
 </style>
+
+<script>
+  let inactivityTimeout;
+
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimeout);
+    inactivityTimeout = setTimeout(logoutUser, 15 * 60 * 1000); // 1分钟
+  }
+
+  function logoutUser() {
+    window.location.href = '/logout/';  // 跳转至登出页面
+  }
+
+  // 监听用户活动事件
+  document.addEventListener('mousemove', resetInactivityTimer);
+  document.addEventListener('keypress', resetInactivityTimer);
+  document.addEventListener('scroll', resetInactivityTimer);
+
+  // 初始化计时器
+  resetInactivityTimer();
+</script>

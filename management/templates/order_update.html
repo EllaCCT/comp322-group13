@@ -6,76 +6,153 @@
 
 {% csrf_token %}
 {% block content %}
+<style>
+    /* 新增样式 */
+    .customer-info-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    
+    .customer-info-item {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .customer-info-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .customer-info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+    
+    .customer-info-value {
+        color: #212529;
+    }
+
+    button[type="submit"] {
+        background: #007bff !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 5px !important;
+        padding: 12px 30px !important;
+        font-size: 16px !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        margin-top: 2rem !important;
+    }
+
+    button[type="submit"]:hover {
+        background: #0056b3 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+    }
+</style>
+
 <div>
     <h2>Order Details</h2>
     
     <form method="post">
         {% csrf_token %}
 
-        <!-- 客戶基本信息（只讀） -->
-        <div>
-            <p>Name: {{ order.user.username }}</p>
-            <p>Email:{{order.user.email}}</p>
-            <p>Shipping Address: {{ order.shipping_address }}</p>
-            <p>Ordered Date: {{ order.date_added}}
+        <!-- 修改后的客戶基本信息（只讀） -->
+        <div class="customer-info-section">
+            <div class="customer-info-item">
+                <div class="customer-info-label">Name:</div>
+                <div class="customer-info-value">{{ order.user.username }}</div>
+            </div>
+            
+            <div class="customer-info-item">
+                <div class="customer-info-label">Email:</div>
+                <div class="customer-info-value">{{ order.user.email }}</div>
+            </div>
+            
+            <div class="customer-info-item">
+                <div class="customer-info-label">Shipping Address:</div>
+                <div class="customer-info-value">{{ order.shipping_address }}</div>
+            </div>
+            
+            <div class="customer-info-item">
+                <div class="customer-info-label">Ordered Date:</div>
+                <div class="customer-info-value">{{ order.date_added }}</div>
+            </div>
         </div>
 
-
-         <!-- 狀態對應的日期顯示 -->
-        <div>
+        <!-- 狀態對應的日期顯示 -->
+        <div class="customer-info-section">
             {% if order.status == 'Shipped' %}
-                <p>Shipment Date: {{ order.shipment_date|date:"F j, Y, g:i a" }}</p>
+                <div class="customer-info-item">
+                    <div class="customer-info-label">Shipment Date:</div>
+                    <div class="customer-info-value">{{ order.shipment_date|date:"F j, Y, g:i a" }}</div>
+                </div>
             {% endif %}
             {% if order.status == 'Cancelled' %}
-                <p>Cancellation Date: {{ order.cancellation_date|date:"F j, Y, g:i a" }}</p>
+                <div class="customer-info-item">
+                    <div class="customer-info-label">Cancellation Date:</div>
+                    <div class="customer-info-value">{{ order.cancellation_date|date:"F j, Y, g:i a" }}</div>
+                </div>
             {% endif %}
             {% if order.status == 'Refunded' %}
-                <p>Cancellation Date: {{ order.cancellation_date|date:"F j, Y, g:i a" }}</p>
-                <p>Refund Date: {{ order.refund_date|date:"F j, Y, g:i a" }}</p>
+                <div class="customer-info-item">
+                    <div class="customer-info-label">Cancellation Date:</div>
+                    <div class="customer-info-value">{{ order.cancellation_date|date:"F j, Y, g:i a" }}</div>
+                </div>
+                <div class="customer-info-item">
+                    <div class="customer-info-label">Refund Date:</div>
+                    <div class="customer-info-value">{{ order.refund_date|date:"F j, Y, g:i a" }}</div>
+                </div>
             {% endif %}
         </div>
 
-        <div>
+        <div class="customer-info-section">
             {{ form.as_p }}  <!-- 僅渲染 status 字段 -->
         </div>
 
         <!-- 訂單項目顯示（非表單） -->
-    <div>
-    <h3>Order Items</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in order.items.all %}
-                <tr>
-                    <td>{{ item.product.name }}
-                        {% if item.color %}<br/>- Color: {{ item.color }}{% endif %}
-                        {% if item.size %}<br/>- Size: {{ item.size }}{% endif %}
-                    </td>
-                   
-                    <td>{{ item.quantity }}</td>
-                    <td>${{item.total_price }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    </div>
         <div>
-            <p>Total Price: ${{ order.total_price }}</p>
-    </div>
+            <h3>Order Items</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                        <tr>
+                            <td>{{ item.product.name }}
+                                {% if item.color %}<br/>- Color: {{ item.color }}{% endif %}
+                                {% if item.size %}<br/>- Size: {{ item.size }}{% endif %}
+                            </td>
+                           
+                            <td>{{ item.quantity }}</td>
+                            <td>${{item.total_price }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="customer-info-section">
+            <div class="customer-info-item">
+                <div class="customer-info-label">Total Price:</div>
+                <div class="customer-info-value">${{ order.total_price }}</div>
+            </div>
+        </div>
 
         <button type="submit">Save Changes</button>
-        <span>
-        <div>
-        <a href="{% url 'vendor_order_list' %}">← Back to Orders</a>
+        <div style="margin-top: 20px;">
+            <a href="{% url 'vendor_order_list' %}">← Back to Orders</a>
         </div>
-        </span>
     </form>
 </div>
 {% endblock %}
