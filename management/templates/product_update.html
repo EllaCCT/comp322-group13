@@ -84,7 +84,12 @@
         <div class="attribute-form">
             <label>Color:{{ form.colors }}</label>
             <label>Size:{{ form.sizes }}</label>
-            <label>Stock:{{ form.stock }}</label>
+            <label>
+                Stock:{{ form.stock }}
+                <span style="color: {% if form.stock.value|default:0 > 0 %}green{% else %}red{% endif %};">
+                    ({% if form.stock.value|default:0 > 0 %}In-stock{% else %}Out-of-stock{% endif %})
+                </span>
+            </label>
         </div>
         {% endfor %}
     </div>

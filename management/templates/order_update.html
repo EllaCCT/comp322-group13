@@ -54,6 +54,12 @@
         transform: translateY(-1px) !important;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
     }
+    .total-price {
+        text-align: left;
+        margin: 20px 0;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
 </style>
 
 <div>
@@ -142,10 +148,9 @@
             </table>
         </div>
         
-        <div class="customer-info-section">
-            <div class="customer-info-item">
-                <div class="customer-info-label">Total Price:</div>
-                <div class="customer-info-value">${{ order.total_price }}</div>
+        <div>
+            <div class="total-price">
+                <p>Total Price: ${{ order.total_price }}</p>
             </div>
         </div>
 
